@@ -15,7 +15,7 @@ track.innerHTML = PROJECTS.map((p, i) => `
   <div class="slot">
     <a class="card" href="work/${p.slug}.html" draggable="false">
       <span class="bar"><span>${p.name}${p.demo ? TAG : ''}</span><span>${p.demo ? 'Try it' : 'View project'} →</span></span>
-      ${p.poster ? `<span class="art poster p-${p.slug}"><span class="in">${p.poster}</span></span>`
+      ${THUMBS[p.slug] ? `<span class="art thumb" style="background:${p.color}">${THUMBS[p.slug]}</span>`
         : `<span class="art">${p.image ? `<img src="${p.image}" alt="" draggable="false">` : `<b>${pad(i + 1)}</b>`}</span>`}
     </a>
   </div>`).join('');
@@ -30,9 +30,21 @@ const step = () => (slots[1] ? slots[1].offsetLeft - slots[0].offsetLeft : slots
 const pos = () => track.scrollLeft / step();
 let active = -1, freeTimer;
 
+// A tick you can feel when the project changes. Android has a vibration API. iPhones do not, but
+// iOS 18+ plays a small tick when a switch-style checkbox toggles, so we toggle a hidden one.
+// ponytail: the iPhone path is a known trick, not an official API; it does nothing on older iOS.
+const tick = document.createElement('label');
+tick.setAttribute('aria-hidden', 'true');
+tick.style.cssText = 'position:fixed;left:0;top:0;opacity:0;pointer-events:none';
+tick.innerHTML = '<input type="checkbox" switch tabindex="-1">';
+document.body.append(tick);
+function haptic() {
+  if (!navigator.userActivation?.hasBeenActive) return; // browsers block (and log) it before the first tap
+  if (navigator.vibrate) navigator.vibrate(10); else tick.click();
+}
+
 function setActive(i) {
-  // Android only; iOS ignores it. Chrome blocks (and logs) vibration before the first tap
-  if (active >= 0 && navigator.userActivation?.hasBeenActive) navigator.vibrate?.(8);
+  if (active >= 0) haptic();
   active = i;
   slots.forEach((el, k) => el.classList.toggle('active', k === i));
   ticks.forEach((el, k) => el.classList.toggle('on', k === i));

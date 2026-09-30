@@ -3,6 +3,7 @@
 // Usage: SITE_URL=https://your-domain node build.js
 const fs = require('fs'), path = require('path'), assert = require('assert');
 const PROJECTS = require('./projects.js');
+const THUMBS = require('./thumbs.js');
 
 const SITE = (process.env.SITE_URL || 'https://example.com').replace(/\/$/, '');
 const NAME = 'Shezan';
@@ -37,7 +38,7 @@ PROJECTS.forEach((p, i) => {
       ${p.demo.steps.map((s, k) => `<li><span>${pad(k + 1)}</span>${esc(s)}</li>`).join('\n      ')}
     </ol>
   </div>` : p.image ? `<div class="art hero"><img src="../${esc(p.image)}" alt="${esc(p.name)}"></div>`
-    : p.poster ? `<div class="art hero poster p-${p.slug}"><span class="in">${p.poster}</span></div>`
+    : THUMBS[p.slug] ? `<div class="art hero thumb" style="background:${p.color}">${THUMBS[p.slug]}</div>`
     : `<div class="art hero"><b>${pad(i + 1)}</b></div>`;
   const html = `<!doctype html>
 <html lang="en">
@@ -94,5 +95,5 @@ ${p.demo ? `<script src="../tour.js?v=${V}"></script>\n` : ''}</body>
 });
 // the hand-written home page gets the same stamp on its stylesheet and scripts
 const home = path.join(__dirname, 'index.html');
-fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace(/(style\.css|projects\.js|main\.js)(\?v=\w+)?"/g, `$1?v=${V}"`));
+fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace(/(style\.css|projects\.js|thumbs\.js|main\.js)(\?v=\w+)?"/g, `$1?v=${V}"`));
 console.log(`Built ${PROJECTS.length} case pages in work/ for ${SITE}`);

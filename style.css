@@ -22,7 +22,7 @@ a:hover { color: var(--red); }
 ul, ol { list-style: none; }
 .mute { color: var(--mute); }
 
-/* the apps' own typefaces, used only on their posters */
+/* the apps' own typefaces, used only in their thumbnails */
 @font-face { font-family: "Instrument Serif"; src: url(demo/fonts/InstrumentSerif-Regular.ttf); font-display: swap; }
 @font-face { font-family: "Instrument Serif"; font-style: italic; src: url(demo/fonts/InstrumentSerif-Italic.ttf); font-display: swap; }
 @font-face { font-family: Manrope; font-weight: 600; src: url(demo/fonts/Manrope-SemiBold.ttf); font-display: swap; }
@@ -113,35 +113,9 @@ ul, ol { list-style: none; }
 .art img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
 .art b { font-size: clamp(64px, 12vw, 180px); letter-spacing: -.05em; line-height: 1; }
 
-/* posters: each project's card drawn in that app's own colours and type.
-   Sizes are in cqmin (1% of the card's shorter side), so a poster scales with its card. */
-.poster { container-type: size; background-image: none; }
-.poster .in { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 9cqmin; text-align: left; }
-.poster b { font-size: inherit; letter-spacing: inherit; }
-.p-brief { background: #f2efe8; color: #151411; }
-.p-brief small { font: 3.2cqmin var(--mono); letter-spacing: .1em; color: #5e5a51; }
-.p-brief b { margin: 5cqmin 0 7cqmin; font: 400 17cqmin/.95 "Instrument Serif", Georgia, serif; letter-spacing: -.02em; }
-.p-brief em { display: block; }
-.p-brief .caps { display: flex; gap: 1cqmin; margin-bottom: 4cqmin; }
-.p-brief .caps i { flex: 1; height: 1cqmin; border-radius: 1cqmin; background: #d9d4c7; }
-.p-brief .caps i:first-child { background: #e8441c; }
-.p-brief .caps + small { font: 4cqmin/1.2 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: 0; }
-.p-miu-miu { background: #fdfaf6; color: #2b2a28; }
-.p-miu-miu .in { align-items: center; }
-.p-miu-miu i { flex: none; width: 40cqmin; height: 40cqmin; border-radius: 50%; background: #2b2a28; }
-.p-miu-miu i + i { margin-top: -11cqmin; background: #c4847c; }
-.p-miu-miu small { margin-top: 6cqmin; font: 600 5cqmin Manrope, "Helvetica Neue", sans-serif; }
-.p-avon-industries { background: #004225; color: #fff; }
-.p-avon-industries b { font-size: 25cqmin; font-weight: 800; line-height: .9; letter-spacing: -.04em; }
-.p-avon-industries small { margin-top: 2cqmin; font-size: 4.2cqmin; letter-spacing: .38em; }
-.p-avon-industries span span { margin-top: 12cqmin; font-size: 4cqmin; opacity: .7; }
-.p-nomi { background: #f3efe7; color: #161412; }
-.p-nomi .in { align-items: center; }
-.p-nomi .pc { position: relative; width: 58cqmin; display: flex; flex-direction: column; padding: 4cqmin; background: #fbf8f2; border: 1px solid #ddd6ca; box-shadow: 0 3cqmin 6cqmin rgba(22, 20, 18, .12); transform: rotate(-4deg); }
-.p-nomi .well { height: 32cqmin; background: linear-gradient(135deg, #ffc98a, #ffb3a1); }
-.p-nomi b { margin-top: 4cqmin; font-size: 6.4cqmin; font-weight: 700; line-height: 1; letter-spacing: -.03em; }
-.p-nomi small { margin-top: 3cqmin; font: 2.8cqmin var(--mono); color: #5f5a52; }
-.p-nomi i { position: absolute; top: -7cqmin; right: -7cqmin; width: 19cqmin; height: 19cqmin; border-radius: 50%; display: grid; place-items: center; border: .8cqmin solid #d8391b; background: rgba(251, 248, 242, .7); color: #d8391b; font: 700 4cqmin var(--mono); font-style: normal; transform: rotate(14deg); }
+/* thumbnails: a square drawing (thumbs.js) scaled to fit the card, centred on the project's colour */
+.thumb { background-image: none; }
+.thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 
 /* details of the active project */
 .detail {

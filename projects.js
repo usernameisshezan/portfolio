@@ -1,13 +1,13 @@
 // The only file to edit when adding a project: add one entry, then run `node build.js`.
 // image / shots are paths from the site root (e.g. 'img/nomi.jpg'); leave image '' for the dotted placeholder.
-// poster is the home-page card, drawn in the app's own colours (styled by .p-<slug> in style.css);
+// color is the background of the project's thumbnail; the drawing itself lives in thumbs.js under the slug;
 // tint is the colour the first screen fades to while that project is centred.
 // image is used for link previews, and as the project page's picture when there is no demo.
 const PROJECTS = [
   {
     slug: 'nomi',
-    tint: '#f6dfcf',
-    poster: '<span class="pc"><span class="well"></span><b>Somewhere you<br>want to go.</b><small>nomi · Delhi NCR</small><i>NOMI</i></span>',
+    tint: '#f8c49a',
+    color: '#f09a55',
     name: 'Nomi',
     year: '2026',
     role: 'Design & development',
@@ -23,8 +23,8 @@ const PROJECTS = [
   },
   {
     slug: 'brief',
-    tint: '#e9e2d3',
-    poster: '<small>WED 30 SEP</small><b>Good morning,<em>Shezan.</em></b><span class="caps"><i></i><i></i><i></i><i></i><i></i></span><small>5 things worth your time.</small>',
+    tint: '#ecdc9a',
+    color: '#151411',
     name: 'Brief',
     year: '2026',
     role: 'Design & development',
@@ -59,8 +59,8 @@ const PROJECTS = [
   },
   {
     slug: 'miu-miu',
-    tint: '#efd9d4',
-    poster: '<i></i><i></i><small>miu miu</small>',
+    tint: '#f0bcc2',
+    color: '#c4847c',
     name: 'Miu Miu',
     year: '2026',
     role: 'Design & development',
@@ -94,8 +94,8 @@ const PROJECTS = [
   },
   {
     slug: 'avon-industries',
-    tint: '#d3e2d8',
-    poster: '<b>AVON</b><small>INDUSTRIES</small><span>Premium packaging, Delhi</span>',
+    tint: '#b7dbc3',
+    color: '#004225',
     name: 'Avon Industries',
     year: '2026',
     role: 'Design & development',
