@@ -15,7 +15,8 @@ track.innerHTML = PROJECTS.map((p, i) => `
   <div class="slot">
     <a class="card" href="work/${p.slug}.html" draggable="false">
       <span class="bar"><span>${p.name}${p.demo ? TAG : ''}</span><span>${p.demo ? 'Try it' : 'View project'} →</span></span>
-      <span class="art">${p.image ? `<img${p.demo ? ' class="ph"' : ''} src="${p.image}" alt="" draggable="false">` : `<b>${pad(i + 1)}</b>`}</span>
+      ${p.poster ? `<span class="art poster p-${p.slug}"><span class="in">${p.poster}</span></span>`
+        : `<span class="art">${p.image ? `<img src="${p.image}" alt="" draggable="false">` : `<b>${pad(i + 1)}</b>`}</span>`}
     </a>
   </div>`).join('');
 face.innerHTML = PROJECTS.map((_, i) => `<i style="transform:rotate(${i * STEP_DEG}deg)"></i>`).join('');
@@ -39,6 +40,7 @@ function setActive(i) {
   $('dialNow').textContent = pad(i + 1);
   const p = PROJECTS[i];
   $('open').href = `work/${p.slug}.html`;
+  $('work').style.setProperty('--tint', p.tint || 'transparent');
   $('dName').textContent = p.name;
   $('dTag').textContent = p.tagline;
   $('dStack').textContent = p.stack;

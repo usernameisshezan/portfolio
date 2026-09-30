@@ -1,9 +1,9 @@
 :root {
-  --bg: #fff;
+  --bg: #f1f0ee;   /* the page: a soft warm grey */
+  --paper: #fff;   /* cards and boxes sit on it in white */
   --ink: #000;
   --red: #e10600;
   --mute: #9a9a9a;
-  --rule: #e4e4e4;
   --line: 1px solid var(--ink);
   --nav: 48px;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
@@ -22,13 +22,10 @@ a:hover { color: var(--red); }
 ul, ol { list-style: none; }
 .mute { color: var(--mute); }
 
-/* page grid: four light column lines behind everything; section frames sit on top in black */
-@media (min-width: 768px) {
-  body::before {
-    content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
-    background: linear-gradient(to right, var(--rule) 1px, transparent 1px) 0 0 / 25% 100%;
-  }
-}
+/* the apps' own typefaces, used only on their posters */
+@font-face { font-family: "Instrument Serif"; src: url(demo/fonts/InstrumentSerif-Regular.ttf); font-display: swap; }
+@font-face { font-family: "Instrument Serif"; font-style: italic; src: url(demo/fonts/InstrumentSerif-Italic.ttf); font-display: swap; }
+@font-face { font-family: Manrope; font-weight: 600; src: url(demo/fonts/Manrope-SemiBold.ttf); font-display: swap; }
 
 /* nav */
 .nav {
@@ -46,7 +43,7 @@ ul, ol { list-style: none; }
 .avail i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
 
 /* buttons: one red for the main action, outline for the rest */
-.btn { display: inline-block; padding: 12px 16px; border: var(--line); background: var(--bg); color: var(--ink); font: 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.btn { display: inline-block; padding: 12px 16px; border: var(--line); background: var(--paper); color: var(--ink); font: 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
 .btn:hover { background: var(--ink); border-color: var(--ink); color: #fff; }
 .btn.red { background: var(--red); border-color: var(--red); color: #fff; }
 .btn.red:hover { background: var(--ink); border-color: var(--ink); color: #fff; }
@@ -59,6 +56,7 @@ ul, ol { list-style: none; }
   min-height: calc(100svh - var(--nav));
   display: flex; flex-direction: column;
   overflow: hidden;
+  background: var(--tint, transparent); transition: background .6s; /* main.js sets --tint to the centred project's colour */
 }
 .hello { padding: 20px 16px 24px; border-bottom: var(--line); }
 .cta { display: flex; gap: 8px; margin-top: 20px; }
@@ -93,7 +91,7 @@ ul, ol { list-style: none; }
   width: var(--card); height: var(--card);
   display: flex; flex-direction: column;
   border: var(--line);
-  background: var(--bg);
+  background: var(--paper);
   user-select: none; -webkit-user-drag: none;
 }
 .bar {
@@ -110,13 +108,42 @@ ul, ol { list-style: none; }
   position: relative;
   display: grid; place-items: center;
   overflow: hidden;
-  background: var(--bg) radial-gradient(circle, #cfcfcf 1.5px, transparent 2px) 0 0 / 16px 16px;
+  background: var(--paper) radial-gradient(circle, #cfcfcf 1.5px, transparent 2px) 0 0 / 16px 16px;
 }
 .art img { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; }
-/* a phone screen, standing on the dots (absolute, so its height can follow the card) */
-.art img.ph { position: absolute; top: 6%; left: 50%; width: auto; height: 88%; transform: translateX(-50%); border: 5px solid #000; border-radius: 13% / 6%; }
 .art b { font-size: clamp(64px, 12vw, 180px); letter-spacing: -.05em; line-height: 1; }
-/* details of the active project, on the page grid */
+
+/* posters: each project's card drawn in that app's own colours and type.
+   Sizes are in cqmin (1% of the card's shorter side), so a poster scales with its card. */
+.poster { container-type: size; background-image: none; }
+.poster .in { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 9cqmin; text-align: left; }
+.poster b { font-size: inherit; letter-spacing: inherit; }
+.p-brief { background: #f2efe8; color: #151411; }
+.p-brief small { font: 3.2cqmin var(--mono); letter-spacing: .1em; color: #5e5a51; }
+.p-brief b { margin: 5cqmin 0 7cqmin; font: 400 17cqmin/.95 "Instrument Serif", Georgia, serif; letter-spacing: -.02em; }
+.p-brief em { display: block; }
+.p-brief .caps { display: flex; gap: 1cqmin; margin-bottom: 4cqmin; }
+.p-brief .caps i { flex: 1; height: 1cqmin; border-radius: 1cqmin; background: #d9d4c7; }
+.p-brief .caps i:first-child { background: #e8441c; }
+.p-brief .caps + small { font: 4cqmin/1.2 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: 0; }
+.p-miu-miu { background: #fdfaf6; color: #2b2a28; }
+.p-miu-miu .in { align-items: center; }
+.p-miu-miu i { flex: none; width: 40cqmin; height: 40cqmin; border-radius: 50%; background: #2b2a28; }
+.p-miu-miu i + i { margin-top: -11cqmin; background: #c4847c; }
+.p-miu-miu small { margin-top: 6cqmin; font: 600 5cqmin Manrope, "Helvetica Neue", sans-serif; }
+.p-avon-industries { background: #004225; color: #fff; }
+.p-avon-industries b { font-size: 25cqmin; font-weight: 800; line-height: .9; letter-spacing: -.04em; }
+.p-avon-industries small { margin-top: 2cqmin; font-size: 4.2cqmin; letter-spacing: .38em; }
+.p-avon-industries span span { margin-top: 12cqmin; font-size: 4cqmin; opacity: .7; }
+.p-nomi { background: #f3efe7; color: #161412; }
+.p-nomi .in { align-items: center; }
+.p-nomi .pc { position: relative; width: 58cqmin; display: flex; flex-direction: column; padding: 4cqmin; background: #fbf8f2; border: 1px solid #ddd6ca; box-shadow: 0 3cqmin 6cqmin rgba(22, 20, 18, .12); transform: rotate(-4deg); }
+.p-nomi .well { height: 32cqmin; background: linear-gradient(135deg, #ffc98a, #ffb3a1); }
+.p-nomi b { margin-top: 4cqmin; font-size: 6.4cqmin; font-weight: 700; line-height: 1; letter-spacing: -.03em; }
+.p-nomi small { margin-top: 3cqmin; font: 2.8cqmin var(--mono); color: #5f5a52; }
+.p-nomi i { position: absolute; top: -7cqmin; right: -7cqmin; width: 19cqmin; height: 19cqmin; border-radius: 50%; display: grid; place-items: center; border: .8cqmin solid #d8391b; background: rgba(251, 248, 242, .7); color: #d8391b; font: 700 4cqmin var(--mono); font-style: normal; transform: rotate(14deg); }
+
+/* details of the active project */
 .detail {
   display: grid; grid-template-columns: repeat(4, 1fr);
   min-height: 104px;
@@ -165,7 +192,7 @@ ul, ol { list-style: none; }
 .case { max-width: 1100px; margin: 0 auto; padding: 48px 16px 96px; }
 .case h1 { font-size: clamp(48px, 10vw, 140px); line-height: .9; letter-spacing: -.05em; }
 .lede { font-size: clamp(20px, 2.4vw, 32px); line-height: 1.15; letter-spacing: -.02em; color: var(--mute); margin: 16px 0 40px; max-width: 28ch; }
-.meta { display: grid; grid-template-columns: repeat(3, 1fr); border: var(--line); background: var(--bg); font-size: 14px; }
+.meta { display: grid; grid-template-columns: repeat(3, 1fr); border: var(--line); background: var(--paper); font-size: 14px; }
 .meta div { padding: 12px; }
 .meta div + div { border-left: var(--line); }
 .meta dt { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: var(--mute); margin-bottom: 4px; }
@@ -175,8 +202,8 @@ ul, ol { list-style: none; }
 .hero.demo {
   aspect-ratio: auto;
   display: grid; grid-template-columns: 1fr auto 1fr; grid-template-rows: repeat(var(--n), 60svh); column-gap: 56px;
-  padding: 0 24px;
-  background: var(--bg);
+  padding: 56px 24px; /* keeps the phone clear of the strip above and the box below */
+  background: var(--paper);
 }
 /* iPhone 16 Pro, drawn in CSS: black bezel, titanium band (box-shadow rings), side buttons.
    The iframe is a 393x852 screen scaled by --k, so everything else is sized from --k too. */
@@ -221,9 +248,9 @@ ul, ol { list-style: none; }
 .details li div { width: 100%; padding-top: 12px; border-top: var(--line); }
 .details b { display: block; margin-bottom: 8px; font-size: clamp(44px, 5.5vw, 76px); line-height: .9; letter-spacing: -.05em; transition: color .4s; }
 .details li.on b { color: var(--red); }
-.try { border: var(--line); border-top: 0; background: var(--bg); font-size: 14px; }
+.try { border: var(--line); border-top: 0; background: var(--paper); font-size: 14px; }
 .try-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 8px 12px; border-bottom: var(--line); font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
-.try button { padding: 6px 10px; border: var(--line); background: var(--bg); color: var(--ink); font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
+.try button { padding: 6px 10px; border: var(--line); background: var(--paper); color: var(--ink); font: inherit; letter-spacing: inherit; text-transform: inherit; cursor: pointer; }
 .try button:hover { background: var(--red); border-color: var(--red); color: #fff; }
 .try ol { display: grid; grid-template-columns: repeat(4, 1fr); }
 .try li { padding: 12px; }
@@ -301,7 +328,7 @@ ul, ol { list-style: none; }
     pointer-events: none;
   }
   .bar-bottom a { pointer-events: auto; }
-  .sq { width: 56px; height: 56px; display: grid; place-items: center; border: var(--line); background: var(--bg); font: 11px var(--mono); }
+  .sq { width: 56px; height: 56px; display: grid; place-items: center; border: var(--line); background: var(--paper); font: 11px var(--mono); }
   .sq-fill { background: var(--ink); color: #fff; font-size: 20px; }
   .sq-fill:hover { background: var(--red); border-color: var(--red); color: #fff; }
   .hint { font-size: 13px; }

@@ -36,7 +36,9 @@ PROJECTS.forEach((p, i) => {
     <ol>
       ${p.demo.steps.map((s, k) => `<li><span>${pad(k + 1)}</span>${esc(s)}</li>`).join('\n      ')}
     </ol>
-  </div>` :`<div class="art hero">${p.image ? `<img src="../${esc(p.image)}" alt="${esc(p.name)}">` : `<b>${pad(i + 1)}</b>`}</div>`;
+  </div>` : p.image ? `<div class="art hero"><img src="../${esc(p.image)}" alt="${esc(p.name)}"></div>`
+    : p.poster ? `<div class="art hero poster p-${p.slug}"><span class="in">${p.poster}</span></div>`
+    : `<div class="art hero"><b>${pad(i + 1)}</b></div>`;
   const html = `<!doctype html>
 <html lang="en">
 <head>
