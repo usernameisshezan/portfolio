@@ -11,9 +11,9 @@
 <meta property="og:url" content="https://usernameisshezan.github.io/portfolio/work/miu-miu.html">
 <meta property="og:image" content="https://usernameisshezan.github.io/portfolio/img/miu-miu.jpg">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../style.css?v=muo93wls">
+<link rel="stylesheet" href="../style.css?v=muo9k3x6">
 </head>
-<body>
+<body class="has-pager">
 
 <header class="nav">
   <a class="brand" href="../#miu-miu">← Shezan</a>
@@ -33,6 +33,7 @@
     <div><dt>Year</dt><dd>2026</dd></div>
   </dl>
   <div class="hero demo" style="--n:6">
+    <a class="skip" href="#try">Skip the tour ↓</a>
     <ul class="details">
       <li class="on" data-show="join" style="--r:1"><div><b>0</b>buttons to join. Drag one circle into the other.</div></li>
       <li data-show="room" style="--r:2"><div><b>2</b>people per room. Once both have joined, it is closed to everyone else.</div></li>
@@ -41,12 +42,16 @@
       <li data-show="nudge" style="--r:5"><div><b>Shake</b>the phone to send a nudge that says you are thinking of them.</div></li>
       <li data-show="stream" style="--r:6"><div><b>2</b>native apps, iOS and Android, with home-screen widgets on both.</div></li>
     </ul>
-    <div class="phone"><iframe src="../demo/miu-miu.html?v=muo93wls" title="Miu Miu live demo"></iframe></div>
+    <div class="phone">
+      <iframe data-src="../demo/miu-miu.html?v=muo9k3x6" title="Miu Miu live demo"></iframe>
+      <img class="still" src="../img/miu-miu.jpg" alt="Miu Miu on a phone">
+      <button type="button" class="btn red open-demo">Try the demo →</button>
+    </div>
   </div>
-  <div class="try">
+  <div class="try" id="try">
     <div class="try-head">
       <span>Try it · live demo with sample data, nothing is sent</span>
-      <button type="button" onclick="const f = document.querySelector('.phone iframe'); f.src = f.src">Restart</button>
+      <button type="button" onclick="const f = document.querySelector('.phone iframe'); f.src = f.dataset.src">Restart</button>
     </div>
     <ol>
       <li><span>01</span>Drag one circle into the other to join the room</li>
@@ -64,11 +69,16 @@
   </div>
   <div class="links">
     
-    <a href="avon-industries.html">Next: Avon Industries →</a>
   </div>
 </main>
 
+<nav class="pager" aria-label="Projects">
+  <a href="../#miu-miu">← All work</a>
+  <span>03 / 04</span>
+  <a href="avon-industries.html">Next<b>: Avon Industries</b> →</a>
+</nav>
+
 <footer class="foot">© 2026 Shezan</footer>
-<script src="../tour.js?v=muo93wls"></script>
+<script src="../tour.js?v=muo9k3x6"></script>
 </body>
 </html>

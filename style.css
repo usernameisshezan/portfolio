@@ -66,18 +66,27 @@ ul, ol { list-style: none; }
 .intro em { font-style: normal; color: var(--red); }
 .heading { display: none; }
 .track {
-  --card: max(220px, min(36vw, calc(100svh - 450px)));
+  --card: max(220px, min(36vw, calc(100svh - 490px)));
   --step: calc(var(--card) * .7);
   display: flex; align-items: center;
-  flex: none;
+  flex: 1; min-width: 0;
   height: calc(var(--card) + 32px);
-  margin-block: auto;
   padding-inline: calc(50% - var(--step) / 2);
   overflow-x: auto; overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   cursor: grab;
 }
+.stage { position: relative; flex: none; display: flex; margin-block: auto; }
+.arrow { position: absolute; top: 50%; z-index: 120; width: 48px; height: 48px; transform: translateY(-50%); border: var(--line); background: var(--paper); color: var(--ink); font-size: 20px; cursor: pointer; }
+.arrow:hover { background: var(--ink); color: #fff; }
+.arrow:disabled { opacity: .25; cursor: default; background: var(--paper); color: var(--ink); }
+#prev { left: 16px; }
+#next { right: 16px; }
+.dots { display: flex; justify-content: center; padding-bottom: 12px; }
+.dots button { width: 26px; height: 26px; padding: 8px; border: 0; background: none; cursor: pointer; }
+.dots button::before { content: ""; display: block; width: 100%; height: 100%; border: var(--line); }
+.dots button.on::before { background: var(--red); border-color: var(--red); }
 .track::-webkit-scrollbar { display: none; }
 .track.free { scroll-snap-type: none; }
 .slot {
@@ -179,15 +188,31 @@ ul, ol { list-style: none; }
 .hero.demo {
   aspect-ratio: auto;
   display: grid; grid-template-columns: 1fr auto 1fr; grid-template-rows: repeat(var(--n), 60svh); column-gap: 56px;
+  position: relative;
   padding: 56px 24px; /* keeps the phone clear of the strip above and the box below */
   background: var(--paper);
 }
+.skip { position: absolute; top: 16px; right: 16px; z-index: 2; border-bottom: 1px solid currentColor; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+.still, .open-demo { display: none; }
+#try { scroll-margin-top: calc(var(--nav) + 16px); }
+
+/* the demo opened full screen on a phone: a 393x852 screen scaled by --k to fit */
+.fs { position: fixed; inset: 0; z-index: 500; overflow: hidden; background: #000; }
+.fs iframe { position: absolute; left: 50%; top: 50%; width: 393px; height: 852px; margin: -426px 0 0 -196.5px; border: 0; transform: scale(var(--k, 1)); }
+.fs-close { position: absolute; top: max(10px, env(safe-area-inset-top)); right: 10px; width: 40px; height: 40px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .92); color: #000; font-size: 16px; cursor: pointer; }
+
+/* always-visible bar at the bottom of a project page */
+.has-pager { padding-bottom: 48px; }
+.pager { position: fixed; inset: auto 0 0; z-index: 150; height: 48px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; padding: 0 16px; background: var(--ink); color: #fff; font: 12px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
+.pager a:last-child { justify-self: end; }
+.pager a:hover { color: #fff; text-decoration: underline; }
+.pager b { font-weight: inherit; }
 /* iPhone 16 Pro, drawn in CSS: black bezel, titanium band (box-shadow rings), side buttons.
    The iframe is a 393x852 screen scaled by --k, so everything else is sized from --k too. */
 .phone {
   --k: .75; --ti: #c4beb4;
   grid-column: 2; grid-row: 1 / -1; align-self: start;
-  position: sticky; top: calc(var(--nav) + (100svh - var(--nav) - 852px * var(--k) - 14px) / 2);
+  position: sticky; top: calc(var(--nav) + (100svh - var(--nav) - 48px - 852px * var(--k) - 14px) / 2); /* centred between the top bar and the pager */
   box-sizing: content-box;
   width: calc(393px * var(--k)); height: calc(852px * var(--k));
   border: 7px solid #000; border-radius: calc(70.67px * var(--k));
@@ -258,12 +283,13 @@ ul, ol { list-style: none; }
     font-size: 34px; line-height: 1; letter-spacing: -.04em;
   }
   .heading span { display: block; color: var(--mute); }
+  .stage { flex: 1; min-height: 0; margin-block: 0; }
+  .arrow, .dots { display: none; } /* the dial does this job on phones */
   .track {
     --step: 78vw;
-    flex: 1; min-height: 0; height: auto;
+    height: auto;
     align-items: stretch;
     gap: 12px;
-    margin-block: 0;
     cursor: auto;
   }
   .card { width: 100%; height: 100%; }
@@ -323,6 +349,10 @@ ul, ol { list-style: none; }
   /* no scroll story on phones: the phone first, then the callouts as a two-column grid, all lit */
   .hero.demo { grid-template-columns: 1fr 1fr; grid-template-rows: none; gap: 32px 16px; padding: 32px 16px; }
   .hero.demo .phone { position: relative; top: auto; order: -1; grid-column: span 2; grid-row: auto; justify-self: center; }
+  .skip, .phone iframe, .try button { display: none; }
+  .still { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: calc(70.67px * var(--k) - 7px); }
+  .open-demo { display: block; position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); padding: 14px 18px; white-space: nowrap; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); cursor: pointer; }
+  .pager b { display: none; }
   .details li:nth-child(n) { grid-column: auto; grid-row: auto; justify-self: stretch; align-items: flex-start; max-width: none; text-align: left; opacity: 1; }
   .try ol { grid-template-columns: 1fr; }
   .try li + li { border-left: 0; border-top: var(--line); }
