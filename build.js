@@ -6,6 +6,9 @@ const PROJECTS = require('./projects.js');
 
 const SITE = (process.env.SITE_URL || 'https://example.com').replace(/\/$/, '');
 const NAME = 'Shezan';
+// Browsers keep style.css and the scripts for a while. A new ?v= on every build makes them fetch the
+// new files together with the new pages, so nobody sees a new page with last week's styles.
+const V = Date.now().toString(36);
 const out = path.join(__dirname, 'work');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const pad = n => String(n).padStart(2, '0');
@@ -23,7 +26,7 @@ PROJECTS.forEach((p, i) => {
     <ul class="details">
       ${p.demo.details.map((x, k) => `<li${k ? '' : ' class="on"'} data-show="${esc(x.show)}" style="--r:${k + 1}"><div><b>${esc(x.big)}</b>${esc(x.text)}</div></li>`).join('\n      ')}
     </ul>
-    <div class="phone"><iframe src="../${esc(p.demo.src)}" title="${esc(p.name)} live demo"></iframe></div>
+    <div class="phone"><iframe src="../${esc(p.demo.src)}?v=${V}" title="${esc(p.name)} live demo"></iframe></div>
   </div>
   <div class="try">
     <div class="try-head">
@@ -47,7 +50,7 @@ PROJECTS.forEach((p, i) => {
 <meta property="og:url" content="${SITE}/work/${p.slug}.html">
 ${p.image ? `<meta property="og:image" content="${SITE}/${esc(p.image)}">
 <meta name="twitter:card" content="summary_large_image">` : '<meta name="twitter:card" content="summary">'}
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="../style.css?v=${V}">
 </head>
 <body>
 
@@ -82,9 +85,12 @@ ${p.image ? `<meta property="og:image" content="${SITE}/${esc(p.image)}">
 </main>
 
 <footer class="foot">© ${new Date().getFullYear()} ${NAME}</footer>
-${p.demo ? '<script src="../tour.js"></script>\n' : ''}</body>
+${p.demo ? `<script src="../tour.js?v=${V}"></script>\n` : ''}</body>
 </html>
 `;
   fs.writeFileSync(path.join(out, `${p.slug}.html`), html);
 });
+// the hand-written home page gets the same stamp on its stylesheet and scripts
+const home = path.join(__dirname, 'index.html');
+fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace(/(style\.css|projects\.js|main\.js)(\?v=\w+)?"/g, `$1?v=${V}"`));
 console.log(`Built ${PROJECTS.length} case pages in work/ for ${SITE}`);
