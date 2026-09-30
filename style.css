@@ -173,19 +173,22 @@ ul, ol { list-style: none; }
 .index .tag { color: var(--red); }
 .index a:hover .tag { color: #fff; }
 
-/* about + contact */
-.info { display: grid; grid-template-columns: 1fr 1fr; border-top: var(--line); }
-.box { padding: 24px 16px 64px; min-height: 60svh; scroll-margin-top: var(--nav); }
-.box + .box { border-left: var(--line); }
+/* about: the story on the left, the toolkit on the right */
+.about { display: grid; grid-template-columns: 1fr 1fr; border-top: var(--line); scroll-margin-top: var(--nav); }
+.about > div { padding: 24px 16px 72px; }
+.about > div + div { border-left: var(--line); }
+.prose p { max-width: 46ch; margin-top: 1.1em; font-size: clamp(16px, 1.35vw, 19px); line-height: 1.5; }
+.prose .lead { max-width: 17ch; margin: 0 0 32px; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.03; letter-spacing: -.04em; }
+.skills li { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 14px 0; border-top: var(--line); font-size: 15px; line-height: 1.45; }
+.skills li:last-child { border-bottom: var(--line); }
+.skills span { padding-top: 3px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #6b6b6b; }
 .label { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 32px; }
-.box p { font-size: clamp(22px, 2.4vw, 34px); line-height: 1.15; letter-spacing: -.02em; max-width: 24ch; }
-.email { display: block; font-size: clamp(28px, 4vw, 64px); line-height: 1; letter-spacing: -.04em; }
-.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; font: 12px var(--mono); }
-.tags li { border: var(--line); padding: 6px 10px; }
-/* closing call to action */
-.band { padding: 72px 16px 80px; border-top: var(--line); background: var(--ink); color: #fff; }
+/* contact: the closing call to action */
+.band { padding: 72px 16px 80px; border-top: var(--line); background: var(--ink); color: #fff; scroll-margin-top: var(--nav); }
 .band h2 { margin: 20px 0 32px; font-size: clamp(44px, 9vw, 140px); line-height: .9; letter-spacing: -.05em; }
-.band .btn.red:hover { background: #fff; border-color: #fff; color: var(--ink); }
+.email { display: inline-block; font-size: clamp(20px, 4vw, 56px); line-height: 1.1; letter-spacing: -.03em; overflow-wrap: anywhere; border-bottom: 2px solid var(--red); }
+.band .cta { margin-top: 32px; }
+.band .btn:hover, .band .btn.red:hover { background: #fff; border-color: #fff; color: var(--ink); }
 .foot { border-top: var(--line); padding: 12px 16px; font: 11px var(--mono); }
 
 /* case pages */
@@ -333,9 +336,14 @@ ul, ol { list-style: none; }
   .sq-fill:hover { background: var(--red); border-color: var(--red); color: #fff; }
   .hint { font-size: 13px; }
 
-  .info { grid-template-columns: 1fr; }
-  .box { min-height: 0; }
-  .box + .box { border-left: 0; border-top: var(--line); }
+  .about { grid-template-columns: 1fr; }
+  .about > div { padding: 24px 16px 40px; }
+  .about > div + div { border-left: 0; border-top: var(--line); }
+  .prose .lead { margin-bottom: 24px; font-size: 32px; }
+  .prose p { font-size: 17px; }
+  .skills li { grid-template-columns: 1fr; gap: 2px; padding: 12px 0; font-size: 16px; }
+  .band .cta { flex-direction: row; gap: 8px; margin-top: 24px; }
+  .band .cta .btn { flex: 1; padding: 14px 10px; font-size: 12px; }
 
   .case { padding-top: 32px; }
   /* no scroll story on phones: the phone first, then the callouts as a two-column grid, all lit */
