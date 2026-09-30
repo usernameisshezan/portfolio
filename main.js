@@ -45,6 +45,7 @@ function setActive(i) {
   const p = PROJECTS[i];
   $('open').href = `work/${p.slug}.html`;
   $('work').style.setProperty('--tint', p.tint || 'transparent');
+  $('hi').style.setProperty('--to', p.tint || 'transparent'); // the opening screen fades into this as you scroll
   $('dName').textContent = p.name;
   $('dTag').textContent = p.tagline;
   $('dStack').textContent = p.stack;
@@ -177,4 +178,5 @@ addEventListener('click', e => { if (e.target.closest('a, button')) haptic(8); }
 // index.html#nomi opens on that project (case pages link back this way)
 const start = PROJECTS.findIndex(p => '#' + p.slug === location.hash);
 if (start > 0) { track.classList.add('free'); track.scrollLeft = start * step(); settleSoon(); }
+if (start >= 0) $('work').scrollIntoView({ behavior: 'instant' }); // coming back from a project page: skip the opening screen
 update();

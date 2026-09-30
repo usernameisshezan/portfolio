@@ -39,6 +39,7 @@ ul, ol { list-style: none; }
 }
 .nav nav { display: flex; gap: 16px; }
 .nav-start { display: flex; align-items: center; gap: 16px; }
+.nav-start .avail { display: none; } /* the opening screen and the contact section say it */
 .avail { display: flex; align-items: center; gap: 6px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; }
 .avail i { width: 7px; height: 7px; border-radius: 50%; background: var(--red); }
 
@@ -51,22 +52,70 @@ ul, ol { list-style: none; }
 .nav-end { justify-self: end; }
 .brand { font-weight: 700; }
 
+/* the opening screen: black, a live red signal (hello.js), and the name.
+   --s goes 0 → 1 as it scrolls away: the text lifts and fades, the black fades into the first project's colour. */
+.hi {
+  --s: 0;
+  position: relative; overflow: hidden;
+  min-height: calc(100svh - var(--nav));
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 48px 16px 120px;
+  background: color-mix(in srgb, var(--ink), var(--to, var(--ink)) calc(var(--s) * 100%));
+  color: #fff;
+  touch-action: pan-y;
+}
+.wave { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; color: var(--red); } /* signal.js draws in this colour */
+.hi-inner { position: relative; opacity: calc(1 - var(--s) * 1.6); transform: translateY(calc(var(--s) * -80px)); }
+.hi .avail { margin-bottom: 28px; }
+.hi .avail i { animation: beat 1.6s ease-in-out infinite; }
+@keyframes beat { 50% { transform: scale(1.8); opacity: .5; } }
+.hi-name { font-size: clamp(56px, 11vw, 190px); font-weight: 700; line-height: .9; letter-spacing: -.055em; cursor: default; }
+.hi-line { max-width: 22ch; margin-top: 28px; font-size: clamp(22px, 2.6vw, 38px); line-height: 1.15; letter-spacing: -.02em; color: rgba(255, 255, 255, .75); }
+.hi-line span { transition: color .2s; }
+.hi-line span:hover, .hi-line .red { color: var(--red); }
+.hi .cta { flex-wrap: wrap; margin-top: 32px; }
+/* the scroll cue: a mouse with a rolling wheel on computers, a swiping fingertip on phones */
+.hi-cue { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; opacity: calc(1 - var(--s) * 3); transition: opacity .4s; }
+.hi.scrolled .hi-cue { opacity: 0; pointer-events: none; }
+.hi-cue:hover { color: var(--red); }
+.cue-mouse { position: relative; width: 22px; height: 34px; border: 1.5px solid currentColor; border-radius: 11px; }
+.cue-mouse i { position: absolute; left: 50%; top: 6px; width: 3px; height: 7px; margin-left: -1.5px; border-radius: 2px; background: currentColor; animation: wheel 1.6s ease-in-out infinite; }
+@keyframes wheel { 0% { transform: none; opacity: 1; } 70%, 100% { transform: translateY(12px); opacity: 0; } }
+.cue-finger { display: none; position: relative; width: 18px; height: 46px; }
+.cue-finger i { position: absolute; left: 0; top: 0; width: 18px; height: 18px; border-radius: 50%; background: rgba(255, 255, 255, .9); box-shadow: 0 0 0 5px rgba(255, 255, 255, .18); animation: swipe 1.6s cubic-bezier(.4, 0, .2, 1) infinite; }
+.cue-finger::before { content: ""; position: absolute; left: 8px; top: 9px; width: 2px; height: 28px; background: linear-gradient(rgba(255, 255, 255, 0), rgba(255, 255, 255, .6)); transform-origin: top; animation: trail 1.6s cubic-bezier(.4, 0, .2, 1) infinite; }
+@keyframes swipe { 0% { transform: none; opacity: 0; } 15% { opacity: 1; } 70% { transform: translateY(28px); opacity: 1; } 100% { transform: translateY(28px); opacity: 0; } }
+@keyframes trail { 0%, 15% { transform: scaleY(0); opacity: 1; } 70% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
+.cue-touch { display: none; }
+@media (pointer: coarse) { .cue-mouse, .cue-desk { display: none; } .cue-finger { display: block; } .cue-touch { display: inline; } }
+/* nobody scrolled after a few seconds: the page lifts a little to show there is more (signal.js) */
+main.peek { animation: peek 1.3s cubic-bezier(.3, .7, .3, 1); }
+@keyframes peek { 40% { transform: translateY(-56px); } }
+@media (prefers-reduced-motion: reduce) { .hi .avail i, .cue-mouse i, .cue-finger i, .cue-finger::before { animation: none; } }
+
+/* channel strips: every section opens like the opening screen, with a mono label and a live signal (signal.js) */
+.ch { display: flex; align-items: center; gap: 16px; height: 44px; }
+.ch .label { flex: none; margin: 0; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; } /* stays small, even inside the contact section's big-headline rule */
+.sig { flex: 1; min-width: 0; height: 100%; color: var(--red); }
+
 /* work: carousel */
 .work {
   min-height: calc(100svh - var(--nav));
   display: flex; flex-direction: column;
   overflow: hidden;
   background: var(--tint, transparent); transition: background .6s; /* main.js sets --tint to the centred project's colour */
+  scroll-margin-top: var(--nav); /* so a jump to #work lands below the top bar */
 }
-.hello { padding: 20px 16px 24px; border-bottom: var(--line); }
+.hello { padding: 4px 16px 24px; border-bottom: var(--line); }
+.hello .ch { margin-bottom: 8px; }
 .cta { display: flex; gap: 8px; margin-top: 20px; }
 .intro {
-  font-size: clamp(28px, 4.4vw, 68px); line-height: 1; letter-spacing: -.045em;
+  font-size: clamp(40px, 6vw, 104px); font-weight: 700; line-height: .92; letter-spacing: -.05em;
 }
 .intro em { font-style: normal; color: var(--red); }
 .heading { display: none; }
 .track {
-  --card: max(220px, min(34vw, calc(100svh - 500px)));
+  --card: max(220px, min(34vw, calc(100svh - 520px)));
   --step: calc(var(--card) * .7);
   display: flex; align-items: center;
   height: calc(var(--card) + 32px);
@@ -182,7 +231,15 @@ ul, ol { list-style: none; }
 
 /* index: every project as a row */
 .index { border-top: var(--line); }
-.index .label { padding: 24px 16px 0; }
+.index .ch { padding: 4px 16px 12px; }
+.index a { position: relative; }
+/* hovering a row sends a white signal sweeping across it */
+.index a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 4px; height: 8px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='8'%3E%3Cpath d='M0 4 Q6 0 12 4 T24 4' fill='none' stroke='white' stroke-width='1.2'/%3E%3C/svg%3E") repeat-x;
+  clip-path: inset(0 100% 0 0); transition: clip-path .5s cubic-bezier(.3, .7, .3, 1);
+}
+.index a:hover::after { clip-path: inset(0); }
 .index a {
   display: grid; grid-template-columns: repeat(4, 1fr); align-items: baseline;
   padding: 14px 0;
@@ -199,7 +256,10 @@ ul, ol { list-style: none; }
 /* about: the story on the left, the toolkit on the right */
 .about { --line: 1px solid #3a3a3a; display: grid; grid-template-columns: 1fr 1fr; background: var(--ink); color: #fff; scroll-margin-top: var(--nav); } /* dark, with grey rules in place of black ones */
 .about > div { padding: 24px 16px 72px; }
-.about > div + div { border-left: var(--line); }
+.about > .ch { grid-column: 1 / -1; padding: 4px 16px; border-bottom: var(--line); }
+.about > .prose + div { border-left: var(--line); }
+.prose .w { transition: color .2s; }
+.prose .w:hover { color: var(--red); }
 .prose p { max-width: 46ch; margin-top: 1.1em; font-size: clamp(16px, 1.35vw, 19px); line-height: 1.5; }
 .prose .lead { max-width: 17ch; margin: 0 0 32px; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.03; letter-spacing: -.04em; }
 .skills li { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 14px 0; border-top: var(--line); font-size: 15px; line-height: 1.45; }
@@ -207,11 +267,13 @@ ul, ol { list-style: none; }
 .skills span { padding-top: 3px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #9a9a9a; }
 .label { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 32px; }
 /* contact: the closing call to action */
-.band { padding: 72px 16px 80px; background: var(--red); color: #fff; scroll-margin-top: var(--nav); } /* red, so everything inside is white or black */
+.band { padding: 4px 16px 80px; background: var(--red); color: #fff; scroll-margin-top: var(--nav); } /* red, so everything inside is white or black */
 .band h2 { margin: 20px 0 32px; font-size: clamp(44px, 9vw, 140px); line-height: .9; letter-spacing: -.05em; }
 .email { display: inline-block; font-size: clamp(20px, 4vw, 56px); line-height: 1.1; letter-spacing: -.03em; overflow-wrap: anywhere; border-bottom: 2px solid currentColor; }
 .band a:hover { color: var(--ink); }
 .band .avail i { background: #fff; }
+.band .ch { margin-bottom: 44px; }
+.band .sig { color: #fff; }
 .band .cta { margin-top: 32px; }
 .band .btn { border-color: #fff; background: transparent; color: #fff; }
 .band .btn.red { background: #fff; color: var(--ink); }
@@ -309,13 +371,11 @@ ul, ol { list-style: none; }
 
   .work { height: calc(100svh - var(--nav)); }
   .intro, .detail { display: none; }
-  .band { padding: 48px 16px 56px; }
+  .band { padding: 4px 16px 56px; }
   .index a { grid-template-columns: 56px 1fr auto; }
   .index a span:nth-child(3) { display: none; }
-  .nav-start .avail { display: none; } /* no room in the bar; the closing band says it */
-  .hello { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; padding: 16px 16px 12px; border-bottom: 0; }
-  .cta { flex-direction: column; gap: 6px; margin: 0; }
-  .cta .btn { padding: 8px 10px; font-size: 10px; text-align: center; white-space: nowrap; }
+  .hello { padding: 0 16px 12px; border-bottom: 0; }
+  .hello .ch { height: 36px; margin-bottom: 4px; }
   .heading {
     display: block;
     font-size: 34px; line-height: 1; letter-spacing: -.04em;
@@ -343,7 +403,8 @@ ul, ol { list-style: none; }
 
   .about { grid-template-columns: 1fr; }
   .about > div { padding: 24px 16px 40px; }
-  .about > div + div { border-left: 0; border-top: var(--line); }
+  .about > .ch { padding: 4px 16px; }
+  .about > .prose + div { border-left: 0; border-top: var(--line); }
   .prose .lead { margin-bottom: 24px; font-size: 32px; }
   .prose p { font-size: 17px; }
   .skills li { grid-template-columns: 1fr; gap: 2px; padding: 12px 0; font-size: 16px; }

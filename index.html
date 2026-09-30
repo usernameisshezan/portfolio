@@ -7,7 +7,7 @@
 <meta name="description" content="Shezan builds small apps and AI tools, with live demos you can try in the browser.">
 <meta property="og:title" content="Shezan — Selected Work">
 <meta property="og:description" content="Shezan builds small apps and AI tools, with live demos you can try in the browser.">
-<link rel="stylesheet" href="style.css?v=muoarsd3">
+<link rel="stylesheet" href="style.css?v=muofwqma">
 </head>
 <body>
 
@@ -28,14 +28,30 @@
 </header>
 
 <main>
-  <section id="work" class="work">
-    <div class="hello">
-      <p class="intro">I build small apps you can <em>try</em> right here.</p>
-      <h1 class="heading">Selected <span>Work</span></h1>
+  <!-- the opening screen (hello.js): a live signal, the name locking on, and a cue to tune in -->
+  <section class="hi" id="hi">
+    <canvas class="wave" id="wave" aria-hidden="true"></canvas>
+    <div class="hi-inner">
+      <p class="avail"><i></i>Available for work</p>
+      <h1 class="hi-name" id="hiName" aria-label="Hi, I'm Shezan."><span aria-hidden="true">Hi, I'm Shezan.</span></h1>
+      <p class="hi-line"><span>I</span> <span>build</span> <span>small</span> <span>apps</span> <span>and</span> <span>AI</span> <span>tools</span> <span>you</span> <span>can</span> <span class="red">try</span> <span>right</span> <span>here.</span></p>
       <div class="cta">
         <a class="btn red" href="work/brief.html">Try the live demos →</a>
         <a class="btn" href="#contact">Get in touch</a>
       </div>
+    </div>
+    <a class="hi-cue" href="#work" aria-label="Scroll down to the projects">
+      <span class="cue-mouse"><i></i></span>
+      <span class="cue-finger"><i></i></span>
+      <span><span class="cue-desk">Scroll</span><span class="cue-touch">Swipe</span> to tune in</span>
+    </a>
+  </section>
+
+  <section id="work" class="work">
+    <div class="hello">
+      <div class="ch"><h2 class="label">CH 01 · Work</h2><canvas class="sig" aria-hidden="true"></canvas></div>
+      <p class="intro" data-lock>Four apps. <em>Turn</em> the dial.</p>
+      <p class="heading">Selected <span>Work</span></p>
     </div>
 
     <!-- the tuner: the screen shows the station, the dial tunes between them -->
@@ -77,14 +93,14 @@
   </section>
 
   <section class="index">
-    <h2 class="label">Index</h2>
+    <div class="ch"><h2 class="label">CH 02 · Index</h2><canvas class="sig" aria-hidden="true"></canvas></div>
     <ol id="list"></ol>
   </section>
 
   <section class="about" id="about">
+    <div class="ch"><h2 class="label">CH 03 · About</h2><canvas class="sig" aria-hidden="true"></canvas></div>
     <div class="prose">
-      <h2 class="label">About</h2>
-      <p class="lead">I'm Shezan. I like software that gets out of your way.</p>
+      <p class="lead" data-lock>I'm Shezan. I like software that gets out of your way.</p>
       <p>The things I build tend to be small and specific: a calmer way to read the news, a better way to choose where to eat, a private place to leave a note for one person. I design them, build them, and keep sanding until they need fewer buttons than they started with.</p>
       <p>I work across the whole thing. Native iOS in SwiftUI, Android in Compose, Flutter when one codebase makes more sense, and the web in Next.js. Behind the screens I write the pipelines too: Python that gathers the sources, and language models that turn them into something worth reading.</p>
       <p>What I care about most is the part you feel more than see. A swipe that lands. A haptic at the right moment. A screen that is ready before you think to wait for it.</p>
@@ -104,8 +120,9 @@
   </section>
 
   <section class="band" id="contact">
+    <div class="ch"><h2 class="label">CH 04 · Contact</h2><canvas class="sig" aria-hidden="true"></canvas></div>
     <p class="avail"><i></i>Available for work</p>
-    <h2>Have an idea?<br>Let's build it.</h2>
+    <h2 data-lock>Have an idea?<br>Let's build it.</h2>
     <a class="email" href="mailto:shezan.workspace@gmail.com">shezan.workspace@gmail.com</a>
     <div class="cta">
       <a class="btn red" href="mailto:shezan.workspace@gmail.com">Email me →</a>
@@ -116,9 +133,10 @@
 
 <footer class="foot">© 2026 Shezan</footer>
 
-<script src="haptic.js?v=muoarsd3"></script>
-<script src="projects.js?v=muoarsd3"></script>
-<script src="thumbs.js?v=muoarsd3"></script>
-<script src="main.js?v=muoarsd3"></script>
+<script src="haptic.js?v=muofwqma"></script>
+<script src="projects.js?v=muofwqma"></script>
+<script src="thumbs.js?v=muofwqma"></script>
+<script src="main.js?v=muofwqma"></script>
+<script src="signal.js?v=muofwqma"></script>
 </body>
 </html>
