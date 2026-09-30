@@ -19,27 +19,21 @@ for (const p of PROJECTS) assert.match(p.slug, /^[a-z0-9-]+$/, `bad slug "${p.sl
 
 fs.mkdirSync(out, { recursive: true });
 PROJECTS.forEach((p, i) => {
-  if (p.demo) assert.ok(p.image, `${p.slug}: a project with a demo needs an image, shown as the still on phones`);
   const prev = PROJECTS[(i - 1 + PROJECTS.length) % PROJECTS.length];
   const next = PROJECTS[(i + 1) % PROJECTS.length];
   const title = `${p.name} — ${NAME}`;
   // demo hero: a pinned phone with one callout per row (tour.js drives it), the how-to steps underneath
-  // On phones there is no tour: the phone shows a still and a button that opens the demo full screen.
   const hero = p.demo ? `<div class="hero demo" style="--n:${p.demo.details.length}">
     <a class="skip" href="#try">Skip the tour ↓</a>
     <ul class="details">
       ${p.demo.details.map((x, k) => `<li${k ? '' : ' class="on"'} data-show="${esc(x.show)}" style="--r:${k + 1}"><div><b>${esc(x.big)}</b>${esc(x.text)}</div></li>`).join('\n      ')}
     </ul>
-    <div class="phone">
-      <iframe data-src="../${esc(p.demo.src)}?v=${V}" title="${esc(p.name)} live demo"></iframe>
-      <img class="still" src="../${esc(p.image)}" alt="${esc(p.name)} on a phone">
-      <button type="button" class="btn red open-demo">Try the demo →</button>
-    </div>
+    <div class="phone"><iframe src="../${esc(p.demo.src)}?v=${V}" title="${esc(p.name)} live demo"></iframe></div>
   </div>
   <div class="try" id="try">
     <div class="try-head">
       <span>Try it · live demo with sample data, nothing is sent</span>
-      <button type="button" onclick="const f = document.querySelector('.phone iframe'); f.src = f.dataset.src">Restart</button>
+      <button type="button" onclick="const f = document.querySelector('.phone iframe'); f.src = f.src">Restart</button>
     </div>
     <ol>
       ${p.demo.steps.map((s, k) => `<li><span>${pad(k + 1)}</span>${esc(s)}</li>`).join('\n      ')}

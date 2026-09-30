@@ -22,8 +22,6 @@ track.innerHTML = PROJECTS.map((p, i) => `
 face.innerHTML = PROJECTS.map((_, i) => `<i style="transform:rotate(${i * STEP_DEG}deg)"></i>`).join('');
 $('list').innerHTML = PROJECTS.map((p, i) => `
   <li><a href="work/${p.slug}.html"><span>${pad(i + 1)}</span><span>${p.name}${p.demo ? TAG : ''}</span><span>${p.stack}</span><span>${p.year} →</span></a></li>`).join('');
-$('dots').innerHTML = PROJECTS.map(p => `<button aria-label="${p.name}"></button>`).join('');
-const dots = [...$('dots').children];
 $('dialAll').textContent = '/' + pad(N);
 dial.setAttribute('aria-valuemax', N);
 
@@ -50,9 +48,6 @@ function setActive(i) {
   active = i;
   slots.forEach((el, k) => el.classList.toggle('active', k === i));
   ticks.forEach((el, k) => el.classList.toggle('on', k === i));
-  dots.forEach((el, k) => el.classList.toggle('on', k === i));
-  $('prev').disabled = i === 0;
-  $('next').disabled = i === N - 1;
   $('counter').textContent = `${pad(i + 1)} / ${pad(N)}`;
   $('dialNow').textContent = pad(i + 1);
   const p = PROJECTS[i];
@@ -99,11 +94,17 @@ addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') go(active - 1);
 });
 
-// The mouse wheel scrolls the page as usual. The carousel has its own controls: arrows, dots, drag,
-// the arrow keys, and a sideways swipe on a trackpad or touch screen.
-$('prev').onclick = () => go(active - 1);
-$('next').onclick = () => go(active + 1);
-$('dots').onclick = e => { const k = dots.indexOf(e.target); if (k >= 0) go(k); };
+// vertical wheel steps one project at a time; at either end it falls through to normal page scroll
+let wheelLock = 0;
+track.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+  const next = active + Math.sign(e.deltaY);
+  if (next < 0 || next >= N) return;
+  e.preventDefault();
+  if (e.timeStamp < wheelLock) return;
+  wheelLock = e.timeStamp + 450;
+  go(next);
+}, { passive: false });
 
 // mouse drag (touch already scrolls the track natively)
 let down = null, dragged = false;
