@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shezan — Selected Work</title>
+<meta name="description" content="Shezan designs and builds mobile apps and AI tools.">
+<meta property="og:title" content="Shezan — Selected Work">
+<meta property="og:description" content="Shezan designs and builds mobile apps and AI tools.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="./">Shezan</a>
+  <nav class="nav-mid">
+    <a href="#work">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <nav class="nav-end">
+    <a href="https://github.com/usernameisshezan">GitHub</a>
+    <a href="mailto:hello@example.com">Email</a>
+  </nav>
+</header>
+
+<main>
+  <section id="work" class="work">
+    <p class="intro">Shezan designs and <em>builds</em> apps and AI tools.</p>
+    <h1 class="heading">Selected <span>Work</span></h1>
+
+    <div class="track" id="track" aria-label="Projects"></div>
+
+    <div class="detail">
+      <div>
+        <h2 class="label">Project</h2>
+        <p id="counter"></p>
+        <p class="mute">Scroll, drag or ← →</p>
+      </div>
+      <div class="wide">
+        <h2 class="label" id="dName"></h2>
+        <p class="tagline" id="dTag"></p>
+      </div>
+      <div>
+        <h2 class="label">Stack / Year</h2>
+        <p id="dStack"></p>
+        <p id="dYear"></p>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Browse projects" aria-valuemin="1">
+        <div class="dial-face" id="dialFace"></div>
+        <div class="dial-num"><b id="dialNow"></b><span id="dialAll"></span></div>
+      </div>
+      <div class="bar-bottom">
+        <a class="sq" href="#about">About</a>
+        <span class="hint">Turn to browse</span>
+        <a class="sq sq-fill" id="open" href="#" aria-label="Open project">→</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="index">
+    <h2 class="label">Index</h2>
+    <ol id="list"></ol>
+  </section>
+
+  <section class="info">
+    <article id="about" class="box">
+      <h2 class="label">About</h2>
+      <p>I'm Shezan. I design and build mobile apps and AI tools: small, focused products with as little interface as possible.</p>
+      <ul class="tags">
+        <li>Swift</li><li>Flutter</li><li>Next.js</li><li>Supabase</li><li>Firebase</li><li>AI pipelines</li>
+      </ul>
+    </article>
+    <article id="contact" class="box">
+      <h2 class="label">Contact</h2>
+      <a class="email" href="mailto:hello@example.com">hello@<wbr>example.com</a>
+      <ul class="tags">
+        <li><a href="https://github.com/usernameisshezan">GitHub</a></li>
+        <li><a href="https://www.linkedin.com/">LinkedIn</a></li>
+      </ul>
+    </article>
+  </section>
+</main>
+
+<footer class="foot">© 2026 Shezan</footer>
+
+<script src="projects.js"></script>
+<script src="main.js"></script>
+</body>
+</html>

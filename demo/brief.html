@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=393, user-scalable=no">
+<title>Brief — demo</title>
+<!--
+  A web replica of the Brief iOS app for the portfolio. Colours, type and layout are taken from
+  the Swift views (Theme, TodayView, Rows, StoryView, Why, ExploreView, InterestsView, SavedView,
+  YouView) for a 393x852 screen. Stories come from brief-data.js, the briefing bundled in the app.
+  ponytail: no liked-tag boost in the ranking, no long-press menu, share, pull-to-refresh,
+  morning reminder or scroll-reveal; the pill's selected capsule fades instead of sliding.
+  The .ttf fonts are the app's own files; converting them to .woff2 would roughly halve the download.
+-->
+<style>
+@font-face { font-family: "Instrument Serif"; src: url(fonts/InstrumentSerif-Regular.ttf); font-display: swap; }
+@font-face { font-family: "Instrument Serif"; font-style: italic; src: url(fonts/InstrumentSerif-Italic.ttf); font-display: swap; }
+@font-face { font-family: Geist; font-weight: 100 900; src: url(fonts/Geist.ttf); font-display: swap; }
+@font-face { font-family: "Geist Mono"; font-weight: 100 900; src: url(fonts/GeistMono.ttf); font-display: swap; }
+@font-face { font-family: Manrope; font-weight: 200 800; src: url(fonts/Manrope.ttf); font-display: swap; }
+@font-face { font-family: "Plus Jakarta Sans"; font-weight: 200 800; src: url(fonts/PlusJakartaSans.ttf); font-display: swap; }
+
+#app {
+  --paper: #f2efe8; --card: #fbfaf6; --ink: #151411; --ink-soft: #2b2923; --muted: #5e5a51;
+  --hair: #d9d4c7; --seg: #e4dfd3; --accent: #e8441c; --accent-text: #b8330d; --accent-on-ink: #ff8a66;
+  --snap: cubic-bezier(.2, .9, .3, 1);
+}
+#app[data-dark] {
+  --paper: #16140f; --card: #221f19; --ink: #f2efe8; --ink-soft: #d8d2c4; --muted: #a39d90;
+  --hair: #36322b; --seg: #2a2721; --accent: #ff5a2e; --accent-text: #ff8a66; --accent-on-ink: #b8330d;
+}
+/* the three looks: serif headlines stay regular; the sans faces go bold, tight and a little smaller */
+#app[data-face=editorial] { --display: "Instrument Serif"; --dw: 400; --ds: 1; --body: Geist; --tr: -.3px; --em-style: italic; --em-color: var(--ink); --gap: -12px; }
+#app[data-face=manrope] { --display: Manrope; --dw: 700; --ds: .86; --body: Manrope; --tr: -1px; --em-style: normal; --em-color: var(--accent-text); --gap: -6px; }
+#app[data-face=jakarta] { --display: "Plus Jakarta Sans"; --dw: 700; --ds: .86; --body: "Plus Jakarta Sans"; --tr: -1px; --em-style: normal; --em-color: var(--accent-text); --gap: -6px; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; background: #f2efe8; }
+body { -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+button { font: inherit; color: inherit; border: 0; background: none; cursor: pointer; }
+#app {
+  position: relative; width: 393px; height: 852px; margin: 0 auto; overflow: hidden;
+  background: var(--paper); color: var(--ink);
+  font: 400 15px/1.45 var(--body), system-ui, sans-serif;
+  transition: background .3s, color .3s;
+}
+.status { position: absolute; inset: 0 0 auto; height: 59px; z-index: 40; pointer-events: none; font: 600 16px Geist, system-ui, sans-serif; }
+.status .time { position: absolute; left: 52px; top: 19px; }
+.status .island { position: absolute; left: 50%; top: 11px; width: 126px; height: 37px; margin-left: -63px; border-radius: 20px; background: #000; }
+.status .batt { position: absolute; right: 36px; top: 23px; width: 25px; height: 12px; border-radius: 4px; background: var(--ink); }
+.home { position: absolute; left: 50%; bottom: 8px; z-index: 40; width: 134px; height: 5px; margin-left: -67px; border-radius: 3px; background: var(--ink); pointer-events: none; }
+
+/* type */
+.d { font-family: var(--display), serif; font-weight: var(--dw); font-size: calc(var(--s) * var(--ds)); letter-spacing: var(--tr); line-height: 1.12; color: var(--ink); }
+.em { font-style: var(--em-style); color: var(--em-color); }
+.mono, .label { font-family: "Geist Mono", ui-monospace, monospace; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); line-height: 1.3; }
+.label { font-size: 11px; letter-spacing: 1.2px; }
+.acc { color: var(--accent-text); }
+.title { padding-top: 48px; font-weight: inherit; }
+.title .d + .d { margin-top: var(--gap); }
+.cap { margin: 12px 0; color: var(--muted); }
+
+/* screens */
+.scroll { position: absolute; inset: 59px 0 0; overflow-y: auto; scrollbar-width: none; touch-action: pan-y; background: var(--paper); transition: background .3s; }
+.scroll::-webkit-scrollbar { display: none; }
+#screen { padding: 0 24px 130px; }
+.arrive > * { animation: arrive .55s var(--snap) both; animation-delay: calc(var(--i, 0) * 60ms); }
+@keyframes arrive { from { opacity: 0; transform: translateY(18px); } }
+
+/* today */
+.top { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; }
+.avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--ink); color: var(--paper); }
+.top + .title { padding-top: 20px; }
+.sub { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 44px; margin-top: 12px; color: var(--muted); }
+.listen { flex: none; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 14px 0 9px; border: 1px solid var(--hair); border-radius: 22px; font-size: 14px; font-weight: 500; color: var(--ink); font-variant-numeric: tabular-nums; }
+.listen i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); }
+.listen svg { width: 10px; height: 10px; fill: #fff; }
+.listen.pulse { animation: pulse 1.1s ease-out 3; }
+@keyframes pulse { from { box-shadow: 0 0 0 0 var(--accent); } to { box-shadow: 0 0 0 14px transparent; } }
+.caps { display: flex; gap: 4px; margin-top: 20px; }
+.caps i { flex: 1; height: 3px; border-radius: 2px; background: var(--hair); }
+.caps i.on { background: var(--accent); }
+.bar { position: absolute; inset: 59px 0 auto; z-index: 5; height: 44px; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; background: var(--paper); border-bottom: 1px solid var(--hair); transform: translateY(-100%); opacity: 0; transition: transform .25s var(--snap), opacity .2s; }
+.bar.on { transform: none; opacity: 1; }
+
+/* rows: swipe right to save, left to skip */
+.wrap { position: relative; }
+.act { position: absolute; top: 50%; transform: translateY(-50%); font: 12px "Geist Mono", monospace; opacity: var(--o, 0); }
+.act.save { left: 0; color: var(--accent-text); }
+.act.skip { right: 0; color: var(--muted); }
+.row { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--hair); cursor: pointer; touch-action: pan-y; transition: transform .3s var(--snap); }
+.row.drag { transition: none; }
+.row .n { flex: none; width: 22px; padding-top: 4px; letter-spacing: 0; }
+.row.active .n { color: var(--accent-text); }
+.row .label { letter-spacing: 1px; margin-bottom: 4px; }
+.lead { display: block; padding: 28px 0 24px; }
+.lead .d { margin-top: 10px; }
+.lead p { margin-top: 12px; color: var(--ink-soft); }
+.lead p + p { margin-top: 10px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lead .meta { display: flex; justify-content: space-between; margin-top: 14px; letter-spacing: 0; text-transform: none; }
+
+/* nav pill */
+.pillwrap { position: absolute; inset: auto 0 0; z-index: 10; padding: 24px 0 38px; display: flex; justify-content: center; background: linear-gradient(transparent, var(--paper) 50%); transition: transform .4s var(--snap), opacity .3s; }
+.pillwrap.hide { transform: translateY(140px); opacity: 0; }
+.pill { display: flex; gap: 2px; padding: 5px; border-radius: 27px; background: var(--ink); box-shadow: 0 10px 15px rgba(0, 0, 0, .22); }
+.pill button { height: 44px; padding: 0 15px; border-radius: 22px; font-size: 14px; color: var(--paper); transition: background .25s, color .25s, transform .2s; }
+.pill button.on { background: var(--paper); color: var(--ink); font-weight: 500; }
+.pill button:active { transform: scale(.96); }
+
+/* explore, interests */
+.search { display: flex; align-items: center; gap: 10px; height: 52px; margin-top: 20px; padding: 0 16px; border: 1px solid var(--hair); border-radius: 18px; background: var(--card); color: var(--muted); }
+.search svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.search input { flex: 1; min-width: 0; border: 0; outline: 0; background: none; font: 15px var(--body), sans-serif; color: var(--ink); user-select: text; -webkit-user-select: text; }
+.search input::placeholder { color: var(--muted); }
+.sec { display: flex; justify-content: space-between; margin-top: 32px; }
+.topic { padding: 14px 0 4px; border-bottom: 1px solid var(--hair); }
+.trow { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+.trow .label { letter-spacing: .5px; }
+.topic[data-off] .d { color: var(--muted); }
+.line { position: relative; height: 36px; cursor: pointer; touch-action: pan-y; }
+.line::before { content: ""; position: absolute; inset: 17px 0 auto; height: 2px; border-radius: 1px; background: var(--hair); }
+.line i { position: absolute; left: 0; top: 17px; width: var(--x); height: 2px; border-radius: 1px; background: var(--ink); }
+.line b { position: absolute; top: 11px; left: calc(var(--x) - 7px); width: 14px; height: 14px; border-radius: 50%; background: var(--accent); transition: transform .2s; }
+.line.drag b { transform: scale(1.5); }
+.topic[data-off] .line b { background: var(--hair); box-shadow: inset 0 0 0 1.5px var(--muted); }
+.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tags span { padding: 8px 12px; border-radius: 18px; background: var(--ink); color: var(--paper); font-size: 13px; }
+
+/* story */
+.story { z-index: 20; padding: 0; transform: translateY(40px) scale(.96); opacity: 0; pointer-events: none; transition: transform .35s var(--snap), opacity .25s, background .3s; }
+.story.on { transform: none; opacity: 1; pointer-events: auto; }
+.tools { position: sticky; top: 0; z-index: 2; height: 44px; padding: 0 10px; display: flex; justify-content: space-between; background: var(--paper); }
+.tools button { width: 44px; height: 44px; display: grid; place-items: center; }
+.tools svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.tools svg.fill { fill: var(--ink); }
+.body { padding: 8px 24px 40px; }
+.body > .d { margin-top: 12px; }
+.chips { display: flex; gap: 6px; margin-top: 18px; overflow-x: auto; scrollbar-width: none; }
+.chips span { flex: none; padding: 6px 10px; border: 1px solid var(--hair); border-radius: 15px; font-size: 12px; color: var(--ink-soft); }
+.part { margin-top: 28px; }
+.part .label { margin-bottom: 10px; }
+.part p { font-size: 16px; line-height: 1.5; }
+.part .p17 { font-size: 17px; line-height: 1.55; }
+.why { margin-top: 28px; padding: 20px; border-radius: 20px; background: var(--ink); color: var(--paper); }
+.why .label { margin-bottom: 10px; color: var(--accent-on-ink); }
+.why p { font-size: 19px; font-weight: 600; line-height: 1.3; }
+#app[data-face=editorial] .why p { font: 400 23px/1.22 "Instrument Serif", serif; letter-spacing: -.3px; }
+.steps { list-style: none; }
+.steps li { position: relative; display: flex; gap: 14px; padding-bottom: 18px; font-size: 15px; line-height: 1.45; }
+.steps li > span { flex: none; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 1.5px solid var(--ink); background: var(--paper); font: 12px "Geist Mono", monospace; z-index: 1; }
+.steps li > div { padding-top: 4px; }
+.steps li:not(:last-child)::before { content: ""; position: absolute; left: 13px; top: 28px; bottom: 0; width: 1.5px; background: var(--hair); }
+.steps li:last-child { padding-bottom: 0; }
+.steps li:last-child > span { border-color: var(--accent); background: var(--accent); color: #fff; }
+.build { display: flex; gap: 10px; margin-bottom: 10px; font-size: 16px; line-height: 1.45; }
+.next { display: block; width: 100%; margin-top: 40px; padding: 24px 0; border-top: 1px solid var(--hair); text-align: center; }
+.next .d { margin-top: 6px; }
+.whywrap { position: sticky; bottom: 38px; z-index: 2; display: flex; justify-content: center; pointer-events: none; }
+.whywrap button { pointer-events: auto; display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border-radius: 24px; background: var(--ink); color: var(--paper); font-size: 14px; font-weight: 500; box-shadow: 0 10px 15px rgba(0, 0, 0, .22); }
+.whywrap svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+
+/* sheets */
+.scrim { position: absolute; inset: 0; z-index: 29; background: #000; opacity: 0; pointer-events: none; transition: opacity .3s; }
+.scrim.on { opacity: .3; pointer-events: auto; }
+.sheet { position: absolute; inset: auto 0 0; z-index: 30; max-height: 730px; overflow-y: auto; scrollbar-width: none; padding: 0 24px 46px; border-radius: 32px 32px 0 0; background: var(--paper); transform: translateY(105%); transition: transform .4s var(--snap), background .3s; }
+.sheet::-webkit-scrollbar { display: none; }
+.sheet:not(.on) { pointer-events: none; } /* while it slides away it must not swallow taps */
+.sheet.on { transform: none; }
+.sheet.card { background: var(--card); }
+.sheet::before { content: ""; display: block; width: 36px; height: 5px; margin: 8px auto 0; border-radius: 3px; background: var(--hair); }
+.sheet .title { padding-top: 27px; }
+.sheet .label { margin-top: 28px; }
+.faces { display: flex; gap: 8px; margin-top: 10px; }
+.faces button { flex: 1; min-height: 92px; border: 1px solid var(--hair); border-radius: 18px; display: grid; place-content: center; gap: 6px; font-size: 12px; color: var(--ink-soft); }
+.faces button.on { border: 2px solid var(--ink); background: var(--card); }
+.faces b { font-size: 32px; line-height: 1; color: var(--ink); }
+.seg { display: flex; gap: 4px; margin-top: 10px; padding: 4px; border-radius: 26px; background: var(--seg); }
+.seg button { flex: 1; min-height: 44px; border-radius: 22px; font-size: 14px; }
+.seg button.on { background: var(--card); font-weight: 500; box-shadow: 0 1px 3px rgba(0, 0, 0, .11); }
+.note { min-height: 19px; margin-top: 8px; font-size: 13px; color: var(--muted); }
+.whytext { margin-top: 10px; }
+.whytext em { color: var(--accent-text); font-style: var(--em-style); }
+.facts { margin-top: 20px; border-bottom: 1px solid var(--hair); }
+.facts div { display: flex; gap: 12px; align-items: baseline; padding: 12px 0; border-top: 1px solid var(--hair); }
+.facts .label { flex: none; width: 76px; margin: 0; letter-spacing: 0; }
+.pair { display: flex; gap: 8px; margin-top: 20px; }
+.pair button { flex: 1; min-height: 48px; border-radius: 24px; font-size: 14px; font-weight: 500; border: 1px solid var(--hair); }
+.pair button:first-child { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+</style>
+</head>
+<body>
+<div id="app" data-face="editorial">
+  <div class="status"><span class="time">9:41</span><span class="island"></span><span class="batt"></span></div>
+  <div class="bar" id="bar"></div>
+  <main class="scroll" id="screen"></main>
+  <nav class="pillwrap" id="pillwrap"><div class="pill" id="pill"></div></nav>
+  <article class="scroll story" id="story"></article>
+  <div class="scrim" id="scrim" data-act="close"></div>
+  <div class="sheet" id="sheet"></div>
+  <div class="home"></div>
+</div>
+
+<script src="brief-data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const app = $('app'), screen = $('screen'), story = $('story'), sheet = $('sheet');
+const TOPICS = [['ai', 'AI'], ['startups', 'Startups'], ['technology', 'Technology'], ['programming', 'Programming'],
+  ['business', 'Business'], ['finance', 'Finance'], ['photography', 'Photography'], ['products', 'New products']];
+const TABS = ['Today', 'Explore', 'Interests', 'Saved'];
+const ICON = {
+  back: '<svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>',
+  mark: on => `<svg viewBox="0 0 24 24"${on ? ' class="fill"' : ''}><path d="M6 4h12v17l-6-4.5L6 21z"/></svg>`,
+  search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5L21 21"/></svg>',
+  play: '<svg viewBox="0 0 10 10"><path d="M2 1l7 4-7 4z"/></svg>',
+  pause: '<svg viewBox="0 0 10 10"><path d="M1.5 1h2.5v8H1.5zM6 1h2.5v8H6z"/></svg>',
+  info: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg>',
+};
+const NAME = 'Shezan';
+const state = {
+  tab: 'Today', face: 'editorial', length: 5, look: 'evening', query: '',
+  // how much you care about each topic, 0 (off) to 100; the app starts everything at 60
+  weights: { ai: 85, startups: 70, technology: 70, programming: 70, business: 30, finance: 30, photography: 60, products: 60 },
+  saved: [], skipped: new Set(), playing: false, current: 0,
+};
+let lists = {}, cur = null, spoken = 0, listenTimer;
+
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pad = n => String(n).padStart(2, '0');
+const topicName = id => (TOPICS.find(t => t[0] === id) || [id, id])[1];
+const isSaved = s => state.saved.includes(s);
+const D = (size, html, cls = '') => `<div class="d ${cls}" style="--s:${size}px">${html}</div>`;
+const title = (a, b) => `<h1 class="title">${D(48, a)}${b ? D(48, b, 'em') : ''}</h1>`;
+const hour = new Date().getHours();
+const greeting = hour >= 5 && hour < 12 ? 'Good morning,' : hour >= 12 && hour < 17 ? 'Good afternoon,' : 'Good evening,';
+const dateLine = (d => [d.toLocaleString('en-US', { weekday: 'short' }), d.getDate(), d.toLocaleString('en-US', { month: 'short' })].join(' '))(new Date());
+// reading time at about 220 words a minute, at least 1
+const minutes = s => Math.max(1, Math.floor([s.summary, s.what_happened, s.why_it_matters, s.what_to_watch,
+  ...s.how_it_works.map(x => x.detail), ...s.what_to_build].join(' ').split(' ').length / 220));
+const level = w => w === 0 ? 'Off' : w < 35 ? 'A little' : w < 75 ? 'Some' : 'A lot';
+
+// today's order: importance × how much you care about the topic
+function todayList() {
+  return STORIES.filter(s => !state.skipped.has(s.id))
+    .map(s => [s, s.importance * state.weights[s.topic] / 60])
+    .filter(x => x[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, state.length).map(x => x[0]);
+}
+
+function row(s, key, i, { num, topic = true, active } = {}) {
+  return `<div class="row${active ? ' active' : ''}" data-open="${key}:${i}">
+    ${num ? `<span class="mono n">${pad(num)}</span>` : ''}
+    <div>${topic ? `<div class="label">${topicName(s.topic)}</div>` : ''}${D(21, esc(s.headline))}</div>
+  </div>`;
+}
+const swipe = (s, html) => `<div class="wrap"><span class="act save">${isSaved(s) ? 'Saved' : 'Save'}</span><span class="act skip">Skip</span>${html}</div>`;
+
+const screens = {
+  Today() {
+    const list = lists.today = todayList(), lead = list[0];
+    return `<header class="top"><span class="mono">${dateLine}</span><button class="avatar d" style="--s:20px" data-act="you" aria-label="Your brief settings">${NAME[0]}</button></header>
+      ${title(greeting, NAME + '.')}
+      <div class="sub"><span>${list.length ? list.length + ' things worth your time.' : 'Nothing new on your topics yet.'}</span>
+        ${list.length ? `<button class="listen" data-act="listen"><i>${state.playing ? ICON.pause : ICON.play}</i>${state.playing
+          ? `Pause · ${state.current + 1} of ${list.length}` : `Listen · ${list.reduce((a, s) => a + minutes(s), 0)} min`}</button>` : ''}</div>
+      <div class="caps">${list.map((_, i) => `<i${i ? '' : ' class="on"'}></i>`).join('') || '<i></i>'}</div>
+      ${lead ? swipe(lead, `<div class="row lead" data-open="today:0">
+        <div class="mono acc">01 — ${topicName(lead.topic)}</div>
+        ${D(31, esc(lead.headline))}
+        <p>${esc(lead.summary)}</p>
+        <p><b>Why you care: </b>${esc(lead.why_it_matters)}</p>
+        <div class="mono meta"><span>${lead.sources.length} ${lead.sources.length === 1 ? 'source' : 'sources'} · ${minutes(lead)} min</span>${lead.how_it_works.length ? '<span>How it works →</span>' : ''}</div>
+      </div>`) : ''}
+      ${list.slice(1).map((s, k) => swipe(s, row(s, 'today', k + 1, { num: k + 2, active: state.playing && state.current === k + 1 }))).join('')}`;
+  },
+  Explore() {
+    return `${title('Explore')}
+      <label class="search">${ICON.search}<input id="q" placeholder="Search today's stories" value="${esc(state.query)}" autocomplete="off" spellcheck="false"></label>
+      <div id="results">${results()}</div>`;
+  },
+  Interests() {
+    // tags from stories you saved, most frequent first
+    const counts = {};
+    state.saved.forEach(s => s.tags.forEach(t => { counts[t] = (counts[t] || 0) + 1; }));
+    const learned = Object.keys(counts).sort((a, b) => counts[b] - counts[a] || a.localeCompare(b)).slice(0, 8);
+    return `${title('What you', 'care about')}
+      <p class="cap">Drag a line to turn a topic up or down. The dot also moves on its own as you read, save and skip.</p>
+      ${TOPICS.map(([id, name]) => `<div class="topic" data-topic="${id}"><div class="trow">${D(24, name)}<span class="label"></span></div><div class="line"><i></i><b></b></div></div>`).join('')}
+      <div class="label" style="margin-top:32px">Learned from you</div>
+      ${learned.length ? `<div class="tags">${learned.map(t => `<span>${esc(t)}</span>`).join('')}</div>`
+        : '<p class="cap">Save a few stories and the things you keep coming back to show up here.</p>'}`;
+  },
+  Saved() {
+    lists.saved = state.saved;
+    return `${title('Saved')}
+      <p class="cap">${state.saved.length ? 'Open a story and tap its bookmark to remove it.' : 'Swipe a story right on Today, or tap its bookmark, to keep it here.'}</p>
+      ${state.saved.map((s, i) => row(s, 'saved', i)).join('')}`;
+  },
+};
+
+function results() {
+  const q = state.query.trim().toLowerCase();
+  const hits = STORIES.filter(s => !q || [s.headline, s.summary, topicName(s.topic), ...s.tags].join(' ').toLowerCase().includes(q));
+  const html = TOPICS.map(([id, name]) => {
+    const list = lists['topic-' + id] = hits.filter(s => s.topic === id).sort((a, b) => b.importance - a.importance);
+    return list.length ? `<div class="sec"><span class="label">${name}</span><span class="label">${list.length}</span></div>
+      ${list.map((s, i) => row(s, 'topic-' + id, i, { topic: false })).join('')}` : '';
+  }).join('');
+  return html || `<p class="cap" style="margin-top:32px">Nothing matches “${esc(state.query)}” today.</p>`;
+}
+
+function paintTopic(el) {
+  const id = el.dataset.topic, w = state.weights[id], n = STORIES.filter(s => s.topic === id).length;
+  el.toggleAttribute('data-off', w === 0);
+  el.querySelector('.line').style.setProperty('--x', 7 + (el.offsetWidth - 14) * w / 100 + 'px');
+  const label = el.querySelector('.label');
+  label.textContent = w === 0 ? 'Off' : `${level(w)} · ${n} today`;
+  label.classList.toggle('acc', w >= 75);
+}
+
+function render(arrive) {
+  screen.innerHTML = screens[state.tab]();
+  screen.classList.toggle('arrive', !!arrive);
+  if (arrive) [...screen.children].forEach((el, i) => el.style.setProperty('--i', Math.min(i, 8)));
+  screen.querySelectorAll('.topic').forEach(paintTopic);
+  $('pill').innerHTML = TABS.map(t => `<button data-tab="${t}"${t === state.tab ? ' class="on"' : ''}>${t}</button>`).join('');
+  $('bar').innerHTML = `<span class="mono">${dateLine}</span>${D(17, greeting + ' ' + NAME, 'em')}`;
+}
+
+// ---- story ----
+const part = (name, html) => `<section class="part"><div class="label">${name}</div>${html}</section>`;
+function openStory(list, i) {
+  cur = { list, i };
+  const s = list[i], next = list[i + 1];
+  story.innerHTML = `<div class="tools"><button data-act="back" aria-label="Back">${ICON.back}</button><button data-act="save" aria-label="Save">${ICON.mark(isSaved(s))}</button></div>
+    <div class="body">
+      <div class="mono acc">${topicName(s.topic)} · ${pad(i + 1)} of ${pad(list.length)}</div>
+      ${D(38, esc(s.headline))}
+      <div class="chips">${s.sources.map(n => `<span>${esc(n)}</span>`).join('')}</div>
+      ${part('What happened', `<p class="p17">${esc(s.what_happened)}</p>`)}
+      <div class="why"><div class="label">Why it matters</div><p>${esc(s.why_it_matters)}</p></div>
+      ${s.how_it_works.length ? part('How it works', `<ol class="steps">${s.how_it_works.map((x, k) =>
+        `<li><span>${k + 1}</span><div><b>${esc(x.step)}. </b>${esc(x.detail)}</div></li>`).join('')}</ol>`) : ''}
+      ${s.what_to_build.length ? part('What you can build', s.what_to_build.map(t => `<div class="build"><span class="acc">→</span><span>${esc(t)}</span></div>`).join('')) : ''}
+      ${s.what_to_watch ? part('What to watch', `<p>${esc(s.what_to_watch)}</p>`) : ''}
+      ${next ? `<button class="next" data-act="next"><div class="label">Next · ${topicName(next.topic)}</div>${D(21, esc(next.headline))}</button>` : ''}
+    </div>
+    <div class="whywrap"><button data-act="why">${ICON.info}Why am I seeing this?</button></div>`;
+  story.scrollTop = 0;
+  story.classList.add('on');
+}
+
+// ---- sheets ----
+function openSheet(html, card) {
+  sheet.innerHTML = html;
+  sheet.className = 'sheet on' + (card ? ' card' : '');
+  $('scrim').classList.add('on');
+}
+function closeSheet() { sheet.classList.remove('on'); $('scrim').classList.remove('on'); }
+const seg = (key, options) => `<div class="seg">${options.map(([v, name]) => `<button data-set="${key}=${v}"${state[key] == v ? ' class="on"' : ''}>${name}</button>`).join('')}</div>`;
+function youSheet() {
+  const faces = [['editorial', 'Editorial', "400 32px/1 'Instrument Serif'"], ['manrope', 'Manrope', '700 27.5px/1 Manrope'], ['jakarta', 'Jakarta', "700 27.5px/1 'Plus Jakarta Sans'"]];
+  openSheet(`${title('Your brief,', 'your voice')}
+    <div class="label">Typeface</div>
+    <div class="faces">${faces.map(([id, name, font]) => `<button data-set="face=${id}"${state.face === id ? ' class="on"' : ''}><b style="font:${font}">Aa</b>${name}</button>`).join('')}</div>
+    <div class="label">Length</div>${seg('length', [[3, 'Quick · 3'], [5, 'Usual · 5'], [8, 'Deep · 8']])}
+    <div class="label">Appearance</div>${seg('look', [['evening', 'Evening'], ['light', 'Light'], ['dark', 'Dark']])}
+    <p class="note">${state.look === 'evening' ? 'Dark from 7 pm to 6 am, otherwise light.' : ''}</p>`);
+}
+function whySheet() {
+  const s = cur.list[cur.i], w = state.weights[s.topic], t = topicName(s.topic);
+  openSheet(`<div class="label">Why am I seeing this</div>
+    ${D(26, w >= 75 ? `You follow <em>${t}</em> closely, and this is one of today’s biggest stories in it.`
+      : `It’s one of today’s most important stories in <em>${t}</em>. Read, save or skip a few and this gets more personal.`, 'whytext')}
+    <div class="facts"><div><span class="label">Topic</span><span>${t} · you care ${level(w).toLowerCase()}</span></div>
+      ${s.sources.length >= 3 ? `<div><span class="label">Coverage</span><span>${s.sources.length} sources wrote about it</span></div>` : ''}</div>
+    <div class="pair"><button data-act="more">More like this</button><button data-act="less">Less like this</button></div>`, true);
+}
+function applyLook() {
+  app.dataset.face = state.face;
+  app.toggleAttribute('data-dark', state.look === 'dark' || (state.look === 'evening' && (hour < 6 || hour >= 19)));
+}
+
+// ---- listen: reads the brief aloud with the browser's own voice ----
+function listen(on) {
+  state.playing = on;
+  spoken++;
+  clearTimeout(listenTimer);
+  window.speechSynthesis?.cancel();
+  if (on) speak(0); else render();
+}
+function speak(i) {
+  const list = lists.today, turn = ++spoken;
+  if (i >= list.length) return listen(false);
+  state.current = i;
+  if (state.tab === 'Today') render();
+  const next = () => { if (turn === spoken) speak(i + 1); };
+  if (!window.speechSynthesis) { listenTimer = setTimeout(next, 2500); return; }
+  const u = new SpeechSynthesisUtterance(`${list[i].headline}. ${list[i].summary}`);
+  u.onend = next;
+  speechSynthesis.speak(u);
+}
+addEventListener('pagehide', () => window.speechSynthesis?.cancel());
+
+// ---- input ----
+const nudge = d => { const t = cur.list[cur.i].topic, w = state.weights[t]; if (w) state.weights[t] = Math.max(5, Math.min(100, w + d)); };
+const acts = {
+  you: youSheet,
+  why: whySheet,
+  close: closeSheet,
+  back() { story.classList.remove('on'); render(); },
+  next() { openStory(cur.list, cur.i + 1); },
+  save(btn) {
+    const s = cur.list[cur.i];
+    if (isSaved(s)) state.saved.splice(state.saved.indexOf(s), 1); else state.saved.unshift(s);
+    btn.innerHTML = ICON.mark(isSaved(s));
+  },
+  more() { nudge(4); closeSheet(); },
+  less() { nudge(-4); closeSheet(); acts.back(); },
+  listen() { listen(!state.playing); },
+};
+
+function go(tab) {
+  const same = state.tab === tab;
+  state.tab = tab;
+  screen.scrollTop = 0;
+  $('pillwrap').classList.remove('hide');
+  $('bar').classList.remove('on');
+  render(!same);
+}
+
+// ---- guided tour: the project page says which screen to show as its callouts scroll past ----
+const tour = {
+  today() { go('Today'); },
+  listen() { go('Today'); screen.querySelector('.listen')?.classList.add('pulse'); },
+  swipe() { // the second story slides right and is saved, as if a finger did it
+    go('Today');
+    const row = screen.querySelectorAll('.wrap .row')[1], s = lists.today[1];
+    if (!row) return;
+    const wrap = row.parentNode;
+    setTimeout(() => {
+      wrap.querySelector('.skip').style.visibility = 'hidden';
+      wrap.style.setProperty('--o', 1);
+      row.style.transform = 'translateX(92px)';
+    }, 500);
+    setTimeout(() => {
+      if (!isSaved(s)) state.saved.unshift(s);
+      wrap.querySelector('.save').textContent = 'Saved';
+    }, 950);
+    setTimeout(() => { row.style.transform = ''; wrap.style.setProperty('--o', 0); }, 1600);
+  },
+  why() { go('Today'); openStory(lists.today, 0); whySheet(); },
+  interests() { go('Interests'); },
+  faces() { go('Today'); youSheet(); },
+};
+addEventListener('message', e => {
+  if (e.source !== parent || !tour[e.data?.show]) return;
+  closeSheet();
+  story.classList.remove('on');
+  tour[e.data.show]();
+});
+
+let g = null, moved = false;
+app.addEventListener('click', e => {
+  if (moved) { moved = false; return; }
+  const t = e.target.closest('[data-act],[data-open],[data-tab],[data-set]');
+  if (!t) return;
+  if (t.dataset.tab) go(t.dataset.tab);
+  else if (t.dataset.open) {
+    const [key, i] = t.dataset.open.split(':');
+    openStory(lists[key], +i);
+  } else if (t.dataset.set) {
+    const [key, v] = t.dataset.set.split('=');
+    state[key] = isNaN(v) ? v : +v;
+    applyLook();
+    youSheet();
+    render();
+  } else acts[t.dataset.act](t);
+});
+app.addEventListener('input', e => {
+  if (e.target.id !== 'q') return;
+  state.query = e.target.value;
+  $('results').innerHTML = results();
+});
+
+// one gesture handler: sideways on a Today row saves or skips, sideways on a topic line sets its weight,
+// and a mouse drag scrolls (touch scrolls natively)
+const rubber = x => Math.sign(x) * (Math.abs(x) <= 80 ? Math.abs(x) : 80 + (Math.abs(x) - 80) * .3);
+function setWeight(line, e) {
+  const r = line.getBoundingClientRect(), topic = line.parentNode;
+  const v = Math.round((e.clientX - r.left - 7) / (r.width - 14) * 20) * 5; // snap to 5s
+  state.weights[topic.dataset.topic] = Math.max(0, Math.min(100, v));
+  paintTopic(topic);
+}
+app.addEventListener('pointerdown', e => {
+  moved = false;
+  const sc = e.target.closest('.scroll');
+  if (!sc || e.target.closest('input, button')) return;
+  const line = e.target.closest('.line'), wrap = e.target.closest('.wrap');
+  g = { sc, line, row: wrap && wrap.querySelector('.row'), x: e.clientX, y: e.clientY, top: sc.scrollTop, mouse: e.pointerType === 'mouse', dx: 0 };
+  if (line) line.classList.add('drag');
+});
+app.addEventListener('pointermove', e => {
+  if (!g) return;
+  const dx = e.clientX - g.x, dy = e.clientY - g.y;
+  if (!g.axis) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+    g.axis = (g.row || g.line) && Math.abs(dx) > Math.abs(dy) * 1.5 ? 'x' : 'y';
+    moved = true;
+    if (g.axis === 'x' && g.row) g.row.classList.add('drag');
+  }
+  if (g.axis === 'y') { if (g.mouse) g.sc.scrollTop = g.top - dy; return; }
+  if (g.line) return setWeight(g.line, e);
+  g.dx = rubber(dx);
+  g.row.style.transform = `translateX(${g.dx}px)`;
+  g.row.parentNode.style.setProperty('--o', Math.min(1, Math.abs(g.dx) / 80));
+  g.row.parentNode.querySelector('.save').style.visibility = g.dx > 0 ? '' : 'hidden';
+  g.row.parentNode.querySelector('.skip').style.visibility = g.dx < 0 ? '' : 'hidden';
+});
+function endGesture(e) {
+  if (!g) return;
+  const { row, line, dx, axis } = g;
+  g = null;
+  if (line) { line.classList.remove('drag'); if (!axis) setWeight(line, e); return; } // a tap sets it too
+  if (axis !== 'x' || !row) return;
+  row.classList.remove('drag');
+  const s = lists.today[+row.dataset.open.split(':')[1]];
+  const reset = () => { row.style.transform = ''; row.parentNode.style.setProperty('--o', 0); };
+  if (dx < -80) { // skip for today: the row leaves and the next story moves up
+    row.style.transform = 'translateX(-600px)';
+    setTimeout(() => { state.skipped.add(s.id); render(); }, 220);
+  } else if (dx > 80) {
+    if (!isSaved(s)) state.saved.unshift(s);
+    row.parentNode.querySelector('.save').textContent = 'Saved';
+    setTimeout(reset, 450);
+  } else reset();
+}
+app.addEventListener('pointerup', endGesture);
+app.addEventListener('pointercancel', endGesture);
+
+// the pill hides while you scroll down and returns the moment you scroll up
+let lastTop = 0;
+screen.addEventListener('scroll', () => {
+  const t = screen.scrollTop;
+  if (t < 40 || t < lastTop - 6) { $('pillwrap').classList.remove('hide'); lastTop = t; }
+  else if (t > lastTop + 6) { $('pillwrap').classList.add('hide'); lastTop = t; }
+  $('bar').classList.toggle('on', state.tab === 'Today' && t > 190);
+});
+
+applyLook();
+render(true);
+</script>
+</body>
+</html>

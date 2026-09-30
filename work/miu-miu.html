@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Miu Miu — Shezan</title>
+<meta name="description" content="A private room for two, passing memos as a stack of cards.">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Miu Miu — Shezan">
+<meta property="og:description" content="A private room for two, passing memos as a stack of cards.">
+<meta property="og:url" content="https://usernameisshezan.github.io/portfolio/work/miu-miu.html">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+<header class="nav">
+  <a class="brand" href="../#miu-miu">← Shezan</a>
+  <nav class="nav-mid"><span>03 / 04</span></nav>
+  <nav class="nav-end">
+    <a href="brief.html">Prev</a>
+    <a href="avon-industries.html">Next</a>
+  </nav>
+</header>
+
+<main class="case">
+  <h1>Miu Miu</h1>
+  <p class="lede">A private room for two, passing memos as a stack of cards.</p>
+  <dl class="meta">
+    <div><dt>Role</dt><dd>Design &amp; development</dd></div>
+    <div><dt>Stack</dt><dd>Swift · Android · Firebase</dd></div>
+    <div><dt>Year</dt><dd>2026</dd></div>
+  </dl>
+  <div class="hero demo" style="--n:6">
+    <ul class="details">
+      <li class="on" data-show="join" style="--r:1"><div><b>0</b>buttons to join. Drag one circle into the other.</div></li>
+      <li data-show="room" style="--r:2"><div><b>2</b>people per room. Once both have joined, it is closed to everyone else.</div></li>
+      <li data-show="swipe" style="--r:3"><div><b>Swipe</b>a memo away to clear it. The next one is already waiting.</div></li>
+      <li data-show="mood" style="--r:4"><div><b>3</b>card moods to set the tone: Calm, Warm and Deep.</div></li>
+      <li data-show="nudge" style="--r:5"><div><b>Shake</b>the phone to send a nudge that says you are thinking of them.</div></li>
+      <li data-show="stream" style="--r:6"><div><b>2</b>native apps, iOS and Android, with home-screen widgets on both.</div></li>
+    </ul>
+    <div class="phone"><iframe src="../demo/miu-miu.html" title="Miu Miu live demo"></iframe></div>
+  </div>
+  <div class="try">
+    <div class="try-head">
+      <span>Try it · live demo with sample data, nothing is sent</span>
+      <button type="button" onclick="const f = document.querySelector('.phone iframe'); f.src = f.src">Restart</button>
+    </div>
+    <ol>
+      <li><span>01</span>Drag one circle into the other to join the room</li>
+      <li><span>02</span>Swipe a card sideways to clear it</li>
+      <li><span>03</span>Double-tap a card to heart it</li>
+      <li><span>04</span>Swipe a card up to write back, then send</li>
+    </ol>
+  </div>
+  <div class="body">
+    <p>Two people join a room by dragging one circle into the other. Memos arrive as a stack of cards: swipe one away to clear it, double-tap to heart it, swipe up to write back.</p>
+    <p>New memos also land on the home-screen widget. Native on iOS and Android, sharing one Firestore backend.</p>
+  </div>
+  <div class="shots">
+    
+  </div>
+  <div class="links">
+    
+    <a href="avon-industries.html">Next: Avon Industries →</a>
+  </div>
+</main>
+
+<footer class="foot">© 2026 Shezan</footer>
+<script src="../tour.js"></script>
+</body>
+</html>
