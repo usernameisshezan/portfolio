@@ -34,21 +34,8 @@ const step = () => (slots[1] ? slots[1].offsetLeft - slots[0].offsetLeft : slots
 const pos = () => track.scrollLeft / step();
 let active = -1, freeTimer;
 
-// A tick you can feel when the project changes. Android has a vibration API. iPhones do not, but
-// iOS 18+ plays a small tick when a switch-style checkbox toggles, so we toggle a hidden one.
-// ponytail: the iPhone path is a known trick, not an official API; it does nothing on older iOS.
-const tick = document.createElement('label');
-tick.setAttribute('aria-hidden', 'true');
-tick.style.cssText = 'position:fixed;left:0;top:0;opacity:0;pointer-events:none';
-tick.innerHTML = '<input type="checkbox" switch tabindex="-1">';
-document.body.append(tick);
-function haptic() {
-  if (!navigator.userActivation?.hasBeenActive) return; // browsers block (and log) it before the first tap
-  if (navigator.vibrate) navigator.vibrate(10); else tick.click();
-}
-
 function setActive(i) {
-  if (active >= 0) haptic();
+  if (active >= 0) haptic(); // a tick for every station you pass (haptic.js)
   active = i;
   slots.forEach((el, k) => el.classList.toggle('active', k === i));
   ticks.forEach((el, k) => el.classList.toggle('on', k === i));
@@ -92,7 +79,7 @@ function update() {
 // Snapping is switched off while the dial or mouse drives the track, and back on once it rests.
 function settleSoon() {
   clearTimeout(freeTimer);
-  freeTimer = setTimeout(() => { if (dialLast === null && !down) track.classList.remove('free'); }, 150);
+  freeTimer = setTimeout(() => { if (dialLast === null && !down && !scrub) track.classList.remove('free'); }, 150);
 }
 function go(i) {
   track.scrollTo({ left: clamp(i) * step(), behavior: calm.matches ? 'auto' : 'smooth' });
@@ -156,10 +143,36 @@ dial.addEventListener('pointermove', e => {
 const dialEnd = () => {
   if (dialLast === null) return;
   dialLast = null;
+  haptic(18); // a firmer tick as the dial settles
   go(Math.round(pos()));
 };
 dial.addEventListener('pointerup', dialEnd);
 dial.addEventListener('pointercancel', dialEnd);
+
+// The band is a control too: drag along it to tune. (A click on a label is a drag that does not
+// move; the label buttons keep their own click for the keyboard.) It ignores the wheel and trackpad.
+let scrub = false, scrubTimer;
+function tuneTo(x) {
+  const r = scale.getBoundingClientRect(), t = (x - r.left - r.width * .08) / (r.width * .84); // the band runs from 8% to 92%
+  track.classList.add('free');
+  track.scrollLeft = Math.max(0, Math.min(1, t)) * (N - 1) * step();
+}
+scale.addEventListener('pointerdown', e => { scale.setPointerCapture(e.pointerId); scrub = true; tuneTo(e.clientX); });
+scale.addEventListener('pointermove', e => { if (scrub) tuneTo(e.clientX); });
+const scrubEnd = () => { if (!scrub) return; scrub = false; go(Math.round(pos())); };
+scale.addEventListener('pointerup', scrubEnd);
+scale.addEventListener('pointercancel', scrubEnd);
+// With the pointer over the dial, a trackpad or wheel scroll turns it. Everywhere else the page scrolls.
+dial.addEventListener('wheel', e => {
+  e.preventDefault();
+  track.classList.add('free');
+  track.scrollLeft += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * .5;
+  clearTimeout(scrubTimer);
+  scrubTimer = setTimeout(() => go(Math.round(pos())), 180);
+}, { passive: false });
+
+// buttons and links tick when tapped
+addEventListener('click', e => { if (e.target.closest('a, button')) haptic(8); });
 
 // index.html#nomi opens on that project (case pages link back this way)
 const start = PROJECTS.findIndex(p => '#' + p.slug === location.hash);

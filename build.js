@@ -101,5 +101,5 @@ ${p.demo ? `<script src="../tour.js?v=${V}"></script>\n` : ''}</body>
 });
 // the hand-written home page gets the same stamp on its stylesheet and scripts
 const home = path.join(__dirname, 'index.html');
-fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace(/(style\.css|projects\.js|thumbs\.js|main\.js)(\?v=\w+)?"/g, `$1?v=${V}"`));
+fs.writeFileSync(home, fs.readFileSync(home, 'utf8').replace(/(style\.css|haptic\.js|projects\.js|thumbs\.js|main\.js)(\?v=\w+)?"/g, `$1?v=${V}"`));
 console.log(`Built ${PROJECTS.length} case pages in work/ for ${SITE}`);

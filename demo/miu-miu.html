@@ -192,6 +192,7 @@ textarea::placeholder { color: var(--sec2); }
   <div class="home"></div>
 </div>
 
+<script src="../haptic.js"></script>
 <script>
 const $ = id => document.getElementById(id);
 const join = $('join'), stream = $('stream'), deck = $('deck'), composer = $('composer'), draft = $('draft');
@@ -225,6 +226,7 @@ $('newCode').onclick = () => {
 
 let revealTimers = []; // kept so the tour can cancel a reveal that is still playing
 function startJoin() {
+  haptic(20);
   join.classList.add('settle');
   setP(1);
   revealTimers = [setTimeout(reveal, 250)];
@@ -320,6 +322,7 @@ deck.addEventListener('pointerup', endDrag);
 deck.addEventListener('pointercancel', endDrag);
 
 function dismiss(el, dir, dy) {
+  haptic(10);
   el.style.transition = 'transform .3s ease-out';
   el.style.transform = `translate(${dir * 720}px, ${dy * .2 + 80}px) rotate(${dir * 30}deg)`;
   // promote the next card while this one is still leaving, so there is never an empty beat
@@ -333,6 +336,7 @@ function tap(el) {
   if (t - lastTap > 320) { lastTap = t; return; }
   lastTap = 0;
   if (!el.classList.toggle('loved')) return;
+  haptic(16);
   $('heart').classList.remove('pop');
   void $('heart').offsetWidth;
   $('heart').classList.add('pop');
@@ -363,6 +367,7 @@ composer.addEventListener('pointerup', e => {
 });
 $('send').onclick = () => {
   if (!draft.value.trim()) return;
+  haptic(20);
   composer.classList.add('fly');
   setTimeout(() => {
     composer.classList.add('noanim');

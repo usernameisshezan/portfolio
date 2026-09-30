@@ -200,6 +200,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   <div class="home"></div>
 </div>
 
+<script src="../haptic.js"></script>
 <script src="brief-data.js"></script>
 <script>
 const $ = id => document.getElementById(id);
@@ -329,6 +330,7 @@ function render(arrive) {
 // ---- story ----
 const part = (name, html) => `<section class="part"><div class="label">${name}</div>${html}</section>`;
 function openStory(list, i) {
+  haptic(8);
   cur = { list, i };
   const s = list[i], next = list[i + 1];
   story.innerHTML = `<div class="tools"><button data-act="back" aria-label="Back">${ICON.back}</button><button data-act="save" aria-label="Save">${ICON.mark(isSaved(s))}</button></div>
@@ -412,6 +414,7 @@ const acts = {
   save(btn) {
     const s = cur.list[cur.i];
     if (isSaved(s)) state.saved.splice(state.saved.indexOf(s), 1); else state.saved.unshift(s);
+    haptic(14);
     btn.innerHTML = ICON.mark(isSaved(s));
   },
   more() { nudge(4); closeSheet(); },
@@ -420,6 +423,7 @@ const acts = {
 };
 
 function go(tab) {
+  haptic(8);
   const same = state.tab === tab;
   state.tab = tab;
   screen.scrollTop = 0;
@@ -525,6 +529,7 @@ function endGesture(e) {
   row.classList.remove('drag');
   const s = lists.today[+row.dataset.open.split(':')[1]];
   const reset = () => { row.style.transform = ''; row.parentNode.style.setProperty('--o', 0); };
+  if (Math.abs(dx) > 80) haptic(14); // saved or skipped
   if (dx < -80) { // skip for today: the row leaves and the next story moves up
     row.style.transform = 'translateX(-600px)';
     setTimeout(() => { state.skipped.add(s.id); render(); }, 220);
