@@ -217,7 +217,8 @@ const ICON = {
 };
 const NAME = 'Shezan';
 const state = {
-  tab: 'Today', face: 'editorial', length: 5, look: 'evening', query: '',
+  tab: 'Today', face: 'editorial', length: 5, query: '',
+  look: new URLSearchParams(location.search).get('look') || 'evening', // ?look=light for screenshots
   // how much you care about each topic, 0 (off) to 100; the app starts everything at 60
   weights: { ai: 85, startups: 70, technology: 70, programming: 70, business: 30, finance: 30, photography: 60, products: 60 },
   saved: [], skipped: new Set(), playing: false, current: 0,

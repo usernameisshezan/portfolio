@@ -9,16 +9,18 @@ const calm = matchMedia('(prefers-reduced-motion: reduce)');
 const pad = n => String(n).padStart(2, '0');
 const clamp = i => Math.max(0, Math.min(N - 1, i));
 
+const TAG = ' <i class="tag">Live demo</i>'; // projects with a working demo on their page
+
 track.innerHTML = PROJECTS.map((p, i) => `
   <div class="slot">
     <a class="card" href="work/${p.slug}.html" draggable="false">
-      <span class="bar"><span>${p.name}</span><span>View Case</span></span>
-      <span class="art">${p.image ? `<img src="${p.image}" alt="" draggable="false">` : `<b>${pad(i + 1)}</b>`}</span>
+      <span class="bar"><span>${p.name}${p.demo ? TAG : ''}</span><span>${p.demo ? 'Try it' : 'View project'} →</span></span>
+      <span class="art">${p.image ? `<img${p.demo ? ' class="ph"' : ''} src="${p.image}" alt="" draggable="false">` : `<b>${pad(i + 1)}</b>`}</span>
     </a>
   </div>`).join('');
 face.innerHTML = PROJECTS.map((_, i) => `<i style="transform:rotate(${i * STEP_DEG}deg)"></i>`).join('');
 $('list').innerHTML = PROJECTS.map((p, i) => `
-  <li><a href="work/${p.slug}.html"><span>${pad(i + 1)}</span><span>${p.name}</span><span>${p.stack}</span><span>${p.year} →</span></a></li>`).join('');
+  <li><a href="work/${p.slug}.html"><span>${pad(i + 1)}</span><span>${p.name}${p.demo ? TAG : ''}</span><span>${p.stack}</span><span>${p.year} →</span></a></li>`).join('');
 $('dialAll').textContent = '/' + pad(N);
 dial.setAttribute('aria-valuemax', N);
 

@@ -1,5 +1,6 @@
 // The only file to edit when adding a project: add one entry, then run `node build.js`.
 // image / shots are paths from the site root (e.g. 'img/nomi.jpg'); leave image '' for the dotted placeholder.
+// A project with a demo shows its image as a phone screen (a 393x852 screenshot of the demo's first screen).
 const PROJECTS = [
   {
     slug: 'nomi',
@@ -46,7 +47,7 @@ const PROJECTS = [
         'Open Interests and drag a topic line',
       ],
     },
-    image: '',
+    image: 'img/brief.jpg',
     shots: [],
     links: [],
   },
@@ -79,7 +80,7 @@ const PROJECTS = [
         'Swipe a card up to write back, then send',
       ],
     },
-    image: '',
+    image: 'img/miu-miu.jpg',
     shots: [],
     links: [],
   },
@@ -93,7 +94,7 @@ const PROJECTS = [
     body: [
       'A fast static site that presents the company, its products and how to get in touch.',
     ],
-    image: '',
+    image: 'img/avon-industries.jpg',
     shots: [],
     links: [],
   },
