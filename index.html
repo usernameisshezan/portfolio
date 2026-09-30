@@ -7,7 +7,7 @@
 <meta name="description" content="Shezan builds small apps and AI tools, with live demos you can try in the browser.">
 <meta property="og:title" content="Shezan — Selected Work">
 <meta property="og:description" content="Shezan builds small apps and AI tools, with live demos you can try in the browser.">
-<link rel="stylesheet" href="style.css?v=muo9vnd4">
+<link rel="stylesheet" href="style.css?v=muoagdat">
 </head>
 <body>
 
@@ -38,13 +38,31 @@
       </div>
     </div>
 
-    <div class="track" id="track" aria-label="Projects"></div>
+    <!-- the tuner: the screen shows the station, the dial tunes between them -->
+    <div class="tuner">
+      <div class="screen">
+        <div class="track" id="track" aria-label="Projects"></div>
+        <div class="static" id="static"></div>
+      </div>
+      <div class="controls">
+        <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Tune between projects" aria-valuemin="1">
+          <div class="dial-face" id="dialFace"></div>
+          <div class="dial-num"><b id="dialNow"></b><span>FM</span></div>
+        </div>
+        <div class="bar-bottom">
+          <a class="sq" href="#about">About</a>
+          <span class="hint" id="hint">Turn to tune</span>
+          <a class="sq sq-fill" id="open" href="#" aria-label="Open project">→</a>
+        </div>
+      </div>
+    </div>
+    <div class="scale" id="scale"></div>
 
     <div class="detail">
       <div>
         <h2 class="label">Project</h2>
         <p id="counter"></p>
-        <p class="mute">Scroll, drag or ← →</p>
+        <p class="mute">Turn the dial, drag or ← →</p>
       </div>
       <div class="wide">
         <h2 class="label" id="dName"></h2>
@@ -54,18 +72,6 @@
         <h2 class="label">Stack / Year</h2>
         <p id="dStack"></p>
         <p id="dYear"></p>
-      </div>
-    </div>
-
-    <div class="controls">
-      <div class="dial" id="dial" role="slider" tabindex="0" aria-label="Browse projects" aria-valuemin="1">
-        <div class="dial-face" id="dialFace"></div>
-        <div class="dial-num"><b id="dialNow"></b><span id="dialAll"></span></div>
-      </div>
-      <div class="bar-bottom">
-        <a class="sq" href="#about">About</a>
-        <span class="hint">Turn to browse</span>
-        <a class="sq sq-fill" id="open" href="#" aria-label="Open project">→</a>
       </div>
     </div>
   </section>
@@ -110,8 +116,8 @@
 
 <footer class="foot">© 2026 Shezan</footer>
 
-<script src="projects.js?v=muo9vnd4"></script>
-<script src="thumbs.js?v=muo9vnd4"></script>
-<script src="main.js?v=muo9vnd4"></script>
+<script src="projects.js?v=muoagdat"></script>
+<script src="thumbs.js?v=muoagdat"></script>
+<script src="main.js?v=muoagdat"></script>
 </body>
 </html>

@@ -66,12 +66,10 @@ ul, ol { list-style: none; }
 .intro em { font-style: normal; color: var(--red); }
 .heading { display: none; }
 .track {
-  --card: max(220px, min(36vw, calc(100svh - 450px)));
+  --card: max(220px, min(34vw, calc(100svh - 500px)));
   --step: calc(var(--card) * .7);
   display: flex; align-items: center;
-  flex: none;
   height: calc(var(--card) + 32px);
-  margin-block: auto;
   padding-inline: calc(50% - var(--step) / 2);
   overflow-x: auto; overflow-y: hidden;
   scroll-snap-type: x mandatory;
@@ -79,6 +77,20 @@ ul, ol { list-style: none; }
   cursor: grab;
 }
 .track::-webkit-scrollbar { display: none; }
+/* the tuner: screen on the left, dial on the right, frequency scale underneath */
+.tuner { flex: none; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; margin-block: auto; }
+.screen { position: relative; min-width: 0; }
+.static {
+  position: absolute; inset: 0; z-index: 150; pointer-events: none; opacity: 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .9 -.25'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+.static { /* fade the static out towards every edge, so it has no hard frame */
+  -webkit-mask: linear-gradient(to right, transparent, #000 18% 82%, transparent), linear-gradient(transparent, #000 18% 82%, transparent);
+          mask: linear-gradient(to right, transparent, #000 18% 82%, transparent), linear-gradient(transparent, #000 18% 82%, transparent);
+  -webkit-mask-composite: source-in; mask-composite: intersect;
+}
+.static.on { animation: static .24s steps(1) infinite; }
+@keyframes static { 0% { background-position: 0 0; } 33% { background-position: -37px 21px; } 66% { background-position: 19px -43px; } }
 .track.free { scroll-snap-type: none; }
 .slot {
   flex: 0 0 var(--step); min-width: 0; /* the card is wider than its slot on desktop */
@@ -129,10 +141,47 @@ ul, ol { list-style: none; }
 .detail .wide { grid-column: span 2; }
 .detail .label { margin-bottom: 8px; }
 .tagline { font-size: clamp(16px, 1.7vw, 24px); line-height: 1.15; letter-spacing: -.02em; }
-.controls { display: none; }
+.controls { padding: 0 56px 0 24px; }
+.dial {
+  --d: min(22vw, 300px, calc(100svh - 470px));
+  position: relative;
+  width: var(--d); height: var(--d);
+  margin: 0 auto;
+  border-radius: 50%;
+  touch-action: none;
+  cursor: grab;
+}
+.dial-face { position: absolute; inset: 0; border-radius: 50%; }
+.dial-face::before {
+  content: ""; position: absolute; inset: 0; border-radius: 50%;
+  background: repeating-conic-gradient(from -.5deg, var(--mute) 0 1deg, transparent 1deg 4deg);
+  -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+          mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+}
+/* one tick per station; the face rotates so the tuned one sits at the top */
+.dial-face i { position: absolute; left: 50%; top: 0; height: 50%; width: 0; transform-origin: 50% 100%; }
+.dial-face i::before { content: ""; position: absolute; top: 16%; left: -1px; width: 2px; height: 12%; background: var(--ink); }
+.dial-face i.on::before { left: -2px; width: 4px; height: 18%; background: var(--red); }
+.dial-num {
+  position: absolute; inset: 0;
+  display: grid; grid-auto-flow: column; place-content: center; align-items: baseline; gap: .15em;
+  font-size: calc(var(--d) * .2); letter-spacing: -.04em; font-variant-numeric: tabular-nums;
+  pointer-events: none;
+}
+.dial-num b { font-weight: 400; }
+.dial-num span { font: calc(var(--d) * .055) var(--mono); letter-spacing: .08em; color: var(--mute); }
+.bar-bottom { display: flex; justify-content: center; margin-top: 16px; }
+.sq { display: none; }
+.hint { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; }
+/* the FM band: a needle that follows the dial, and a label per station that you can click */
+.scale { position: relative; height: 46px; border-top: var(--line); --t: 0; }
+.scale::before { content: ""; position: absolute; inset: 0 8% auto; height: 8px; background: repeating-linear-gradient(to right, var(--ink) 0 1px, transparent 1px 12px); opacity: .4; }
+.scale button { position: absolute; top: 14px; left: calc(8% + var(--x) * 84%); transform: translateX(-50%); padding: 4px; border: 0; background: none; color: var(--ink); font: 11px var(--mono); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; cursor: pointer; }
+.scale button:hover, .scale button.on { color: var(--red); }
+.scale i { position: absolute; top: 0; bottom: 0; left: calc(8% + var(--t) * 84%); width: 2px; margin-left: -1px; background: var(--red); }
 
 /* index: every project as a row */
-.index { border-top: var(--line); }
+.index { --line: 1px solid #3a3a3a; background: var(--ink); color: #fff; } /* dark, with grey rules in place of black ones */
 .index .label { padding: 24px 16px 0; }
 .index a {
   display: grid; grid-template-columns: repeat(4, 1fr); align-items: baseline;
@@ -148,14 +197,14 @@ ul, ol { list-style: none; }
 .index a:hover .tag { color: #fff; }
 
 /* about: the story on the left, the toolkit on the right */
-.about { --line: 1px solid #3a3a3a; display: grid; grid-template-columns: 1fr 1fr; background: var(--ink); color: #fff; scroll-margin-top: var(--nav); } /* dark, with grey rules in place of black ones */
+.about { display: grid; grid-template-columns: 1fr 1fr; scroll-margin-top: var(--nav); }
 .about > div { padding: 24px 16px 72px; }
 .about > div + div { border-left: var(--line); }
 .prose p { max-width: 46ch; margin-top: 1.1em; font-size: clamp(16px, 1.35vw, 19px); line-height: 1.5; }
 .prose .lead { max-width: 17ch; margin: 0 0 32px; font-size: clamp(28px, 3.4vw, 50px); line-height: 1.03; letter-spacing: -.04em; }
 .skills li { display: grid; grid-template-columns: 112px 1fr; gap: 16px; padding: 14px 0; border-top: var(--line); font-size: 15px; line-height: 1.45; }
 .skills li:last-child { border-bottom: var(--line); }
-.skills span { padding-top: 3px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #9a9a9a; }
+.skills span { padding-top: 3px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; color: #6b6b6b; }
 .label { font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 32px; }
 /* contact: the closing call to action */
 .band { padding: 72px 16px 80px; border-top: 1px solid #3a3a3a; background: var(--ink); color: #fff; scroll-margin-top: var(--nav); }
@@ -268,57 +317,25 @@ ul, ol { list-style: none; }
     font-size: 34px; line-height: 1; letter-spacing: -.04em;
   }
   .heading span { display: block; color: var(--mute); }
+  .tuner { display: contents; } /* screen and dial stack as parts of the first screen */
+  .screen { flex: 1; min-height: 0; display: flex; }
   .track {
     --step: 78vw;
-    flex: 1; min-height: 0; height: auto;
+    flex: 1; min-width: 0; height: auto;
     align-items: stretch;
     gap: 12px;
-    margin-block: 0;
     cursor: auto;
   }
   .card { width: 100%; height: 100%; }
+  .scale { display: none; }
 
-  .controls { display: block; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
-  .dial {
-    --d: min(54vw, 28svh);
-    position: relative;
-    width: var(--d); height: var(--d);
-    margin: 0 auto;
-    border-radius: 50%;
-    touch-action: none;
-    cursor: grab;
-  }
-  .dial-face { position: absolute; inset: 0; border-radius: 50%; }
-  .dial-face::before {
-    content: ""; position: absolute; inset: 0; border-radius: 50%;
-    background: repeating-conic-gradient(from -.5deg, var(--mute) 0 1deg, transparent 1deg 4deg);
-    -webkit-mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
-            mask: radial-gradient(closest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
-  }
-  /* one tick per project; the face rotates so the active one sits at the top */
-  .dial-face i { position: absolute; left: 50%; top: 0; height: 50%; width: 0; transform-origin: 50% 100%; }
-  .dial-face i::before { content: ""; position: absolute; top: 16%; left: -1px; width: 2px; height: 12%; background: var(--ink); }
-  .dial-face i.on::before { left: -2px; width: 4px; height: 18%; background: var(--red); }
-  .dial-num {
-    position: absolute; inset: 0;
-    display: grid; grid-auto-flow: column; place-content: center;
-    font-size: calc(var(--d) * .2); letter-spacing: -.04em;
-    pointer-events: none;
-  }
-  .dial-num b { font-weight: 400; }
-  .dial-num span { color: var(--mute); }
-
-  .bar-bottom {
-    display: flex; justify-content: space-between; align-items: flex-end;
-    margin-top: -36px;
-    position: relative;
-    pointer-events: none;
-  }
+  .controls { padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); }
+  .dial { --d: min(54vw, 28svh); }
+  .bar-bottom { justify-content: space-between; align-items: flex-end; margin-top: -36px; position: relative; pointer-events: none; }
   .bar-bottom a { pointer-events: auto; }
   .sq { width: 56px; height: 56px; display: grid; place-items: center; border: var(--line); background: var(--paper); font: 11px var(--mono); }
   .sq-fill { background: var(--ink); color: #fff; font-size: 20px; }
   .sq-fill:hover { background: var(--red); border-color: var(--red); color: #fff; }
-  .hint { font-size: 13px; }
 
   .about { grid-template-columns: 1fr; }
   .about > div { padding: 24px 16px 40px; }

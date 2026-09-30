@@ -1,13 +1,15 @@
-// The carousel's scroll position is the single source of truth: the dial, wheel, keys and
-// drag all just scroll the track, and update() derives everything else from scrollLeft.
+// A radio tuner: each project is a station. The track's scroll position is the single source of
+// truth: the dial, the scale, the keys and drag all just scroll the track, and update() derives
+// everything else from scrollLeft, including the blur and static between two stations.
 const STEP_DEG = 30; // dial rotation per project. ponytail: ticks overlap past 12 projects, shrink this if you get there
 const N = PROJECTS.length;
 const $ = id => document.getElementById(id);
-const track = $('track'), dial = $('dial'), face = $('dialFace');
+const track = $('track'), dial = $('dial'), face = $('dialFace'), scale = $('scale'), noise = $('static');
 const desktop = matchMedia('(min-width: 768px)');
 const calm = matchMedia('(prefers-reduced-motion: reduce)');
 const pad = n => String(n).padStart(2, '0');
 const clamp = i => Math.max(0, Math.min(N - 1, i));
+const freq = p => (88.1 + p * 5.4).toFixed(1); // the FM frequency shown for a position on the band
 
 const TAG = ' <i class="tag">Live demo</i>'; // projects with a working demo on their page
 
@@ -22,7 +24,9 @@ track.innerHTML = PROJECTS.map((p, i) => `
 face.innerHTML = PROJECTS.map((_, i) => `<i style="transform:rotate(${i * STEP_DEG}deg)"></i>`).join('');
 $('list').innerHTML = PROJECTS.map((p, i) => `
   <li><a href="work/${p.slug}.html"><span>${pad(i + 1)}</span><span>${p.name}${p.demo ? TAG : ''}</span><span>${p.stack}</span><span>${p.year} →</span></a></li>`).join('');
-$('dialAll').textContent = '/' + pad(N);
+scale.innerHTML = '<i></i>' + PROJECTS.map((p, i) => `<button style="--x:${N > 1 ? i / (N - 1) : 0}">${freq(i)} ${p.name}</button>`).join('');
+const stations = [...scale.querySelectorAll('button')];
+scale.onclick = e => { const k = stations.indexOf(e.target); if (k >= 0) go(k); };
 dial.setAttribute('aria-valuemax', N);
 
 const slots = [...track.children], ticks = [...face.children];
@@ -49,7 +53,8 @@ function setActive(i) {
   slots.forEach((el, k) => el.classList.toggle('active', k === i));
   ticks.forEach((el, k) => el.classList.toggle('on', k === i));
   $('counter').textContent = `${pad(i + 1)} / ${pad(N)}`;
-  $('dialNow').textContent = pad(i + 1);
+  stations.forEach((el, k) => el.classList.toggle('on', k === i));
+  $('hint').textContent = `${PROJECTS[i].name} · ${pad(i + 1)}/${pad(N)}`;
   const p = PROJECTS[i];
   $('open').href = `work/${p.slug}.html`;
   $('work').style.setProperty('--tint', p.tint || 'transparent');
@@ -73,6 +78,13 @@ function update() {
     el.style.zIndex = 100 - Math.round(a * 10);
   });
   face.style.transform = `rotate(${-p * STEP_DEG}deg)`;
+  // between two stations the picture blurs and fills with static, then snaps sharp on the next one
+  const on = Math.max(0, Math.min(N - 1, p)), off = Math.abs(on - Math.round(on)); // off: 0 on a station, .5 halfway
+  $('dialNow').textContent = freq(on);
+  scale.style.setProperty('--t', N > 1 ? on / (N - 1) : 0);
+  track.style.filter = off > .02 && !calm.matches ? `blur(${off * 28}px)` : '';
+  noise.style.opacity = Math.min(.8, off * 2);
+  noise.classList.toggle('on', off > .02);
   const i = clamp(Math.round(p));
   if (i !== active) setActive(i);
 }
@@ -94,17 +106,7 @@ addEventListener('keydown', e => {
   if (e.key === 'ArrowLeft') go(active - 1);
 });
 
-// vertical wheel steps one project at a time; at either end it falls through to normal page scroll
-let wheelLock = 0;
-track.addEventListener('wheel', e => {
-  if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-  const next = active + Math.sign(e.deltaY);
-  if (next < 0 || next >= N) return;
-  e.preventDefault();
-  if (e.timeStamp < wheelLock) return;
-  wheelLock = e.timeStamp + 450;
-  go(next);
-}, { passive: false });
+// The mouse wheel is left alone, so the page scrolls normally over the tuner.
 
 // mouse drag (touch already scrolls the track natively)
 let down = null, dragged = false;
