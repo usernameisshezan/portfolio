@@ -1,7 +1,7 @@
 // The page's broadcast style, carried from the opening screen through every section:
 //  - live signal lines (the opening's big one, and a <canvas class="sig"> in each section's channel
 //    strip) that swell under the cursor or finger and only animate while on screen,
-//  - headlines that lock on letter by letter like a station coming in ([data-lock], once each),
+//  - your name, which locks on letter by letter like a station coming in,
 //  - the opening screen: its signal flattens and sinks as you scroll, the black fades into the tuned
 //    project's colour, and the swipe/scroll cue leaves for good once you have scrolled.
 {
@@ -68,7 +68,7 @@
     main.addEventListener('animationend', () => main.classList.remove('peek'), { once: true });
   }, 4000);
 
-  // ---- headlines lock on like a station coming in ----
+  // ---- the name locks on like a station coming in ----
   const pick = set => set[Math.random() * set.length | 0];
   const noisy = ch => /[A-Z]/.test(ch) ? pick('ABCDEFGHJKLMNPQRSTUVWXYZ') : /[a-z]/.test(ch) ? pick('abcdefghijkmnopqrstuvwxyz') : /[0-9]/.test(ch) ? pick('0123456789') : ch;
   function lockOn(el, done) {
@@ -103,12 +103,4 @@
   tuneName();
   name.parentElement.addEventListener('pointerenter', tuneName);
   name.parentElement.addEventListener('click', tuneName);
-
-  // every other headline tunes in once, the first time it scrolls into view
-  const seen = new IntersectionObserver(entries => entries.forEach(e => {
-    if (!e.isIntersecting) return;
-    seen.unobserve(e.target);
-    lockOn(e.target);
-  }), { threshold: .6 });
-  document.querySelectorAll('[data-lock]').forEach(el => seen.observe(el));
 }

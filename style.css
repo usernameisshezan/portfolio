@@ -73,7 +73,13 @@ ul, ol { list-style: none; }
 .hi-line { max-width: 22ch; margin-top: 28px; font-size: clamp(22px, 2.6vw, 38px); line-height: 1.15; letter-spacing: -.02em; color: rgba(255, 255, 255, .75); }
 .hi-line span { transition: color .2s; }
 .hi-line span:hover, .hi-line .red { color: var(--red); }
-.hi .cta { flex-wrap: wrap; margin-top: 32px; }
+.hi .cta { flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 36px; }
+/* the opening screen's main action: a big red "Get in touch" */
+.btn.big { padding: 22px 32px; font: 700 clamp(22px, 2.6vw, 36px)/1 "Helvetica Neue", Helvetica, Arial, sans-serif; letter-spacing: -.02em; text-transform: none; }
+.hi .btn.big:hover { background: #fff; border-color: #fff; color: var(--ink); }
+.hi-mail { margin-top: 14px; font: 12px var(--mono); color: rgba(255, 255, 255, .6); }
+.hi-mail a { color: #fff; border-bottom: 1px solid rgba(255, 255, 255, .4); }
+.hi-mail a:hover { color: var(--red); border-color: var(--red); }
 /* the scroll cue: a mouse with a rolling wheel on computers, a swiping fingertip on phones */
 .hi-cue { position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 10px; font: 11px var(--mono); text-transform: uppercase; letter-spacing: .08em; white-space: nowrap; opacity: calc(1 - var(--s) * 3); transition: opacity .4s; }
 .hi.scrolled .hi-cue { opacity: 0; pointer-events: none; }
@@ -375,6 +381,7 @@ main.peek { animation: peek 1.3s cubic-bezier(.3, .7, .3, 1); }
   .index a { grid-template-columns: 56px 1fr auto; }
   .index a span:nth-child(3) { display: none; }
   .hello { padding: 0 16px 12px; border-bottom: 0; }
+  .hi .btn.big { flex-basis: 100%; text-align: center; }
   .hello .ch { height: 36px; margin-bottom: 4px; }
   .heading {
     display: block;
